@@ -5,24 +5,27 @@
     <title>Dante's Rings: A Future Vibrant Self Adventure</title>
     
     <link rel="apple-touch-icon" href="Dante_App_Logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="Dante_App_Logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="Dante_App_Logo.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="Dante_App_Logo.png">
+    <meta name="apple-mobile-web-app-title" content="Dante's Rings">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <style>
-        /* --- I. DESIGN SYSTEM TOKENS --- */
+        /* --- I. PRODUCTION THEME TOKENS --- */
         :root {
             --color-roblox-blue: #00A2FF;
             --color-roblox-green: #00E676;
-            --color-neon-purple: #A020F0;
-            --color-neon-pink: #FF69B4;
-            --color-glass-heavy: rgba(0, 0, 0, 0.7);
+            --color-candy-highlight: #FFFFFF;
+            --color-glass-heavy: rgba(0, 0, 0, 0.75);
             --color-glass-border: rgba(255, 255, 255, 0.35);
             --safe-area-top: env(safe-area-inset-top);
             --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
-        /* --- II. UNIVERSAL LAYOUT (ZERO-SLOP) --- */
+        /* --- II. UNIVERSAL LAYOUT (THE CENTERING FIX) --- */
         body {
             margin: 0;
             padding: 0;
@@ -41,8 +44,8 @@
             transition: background 2.5s ease-in-out;
         }
 
-        /* ENVIRONMENTAL SKY BOX */
-        .roblox-cloud-element {
+        /* ENVIRONMENTAL CLOUD DRIFT */
+        .sky-drift-element {
             position: absolute;
             background: rgba(255, 255, 255, 0.85);
             border-radius: 15px;
@@ -55,7 +58,7 @@
             to { transform: translateX(120vw); }
         }
 
-        /* --- III. iOS HUD SHIELD (FIXED TOP - NOTCH AWARE) --- */
+        /* --- III. iOS HUD SHIELD (FIXED TOP - NOTCH PROTECTION) --- */
         #production-header-shield {
             padding-top: calc(var(--safe-area-top) + 12px);
             height: 18vh;
@@ -109,7 +112,7 @@
             transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* --- IV. MASTER Viewport (THE SLOP FIX) --- */
+        /* --- IV. MASTER Viewport (ZERO-SLOP CENTERING) --- */
         #game-engine-viewport {
             flex: 1;
             width: 100%;
@@ -122,7 +125,7 @@
             box-sizing: border-box;
         }
 
-        /* SIDEBARS: Floating Overlays to protect Dead-Center Grid */
+        /* SIDEBARS: Floating Layers to ensure the Grid stays Dead-Center */
         .engine-sidebar-float {
             position: absolute;
             display: flex;
@@ -157,7 +160,7 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.8);
         }
 
-        /* DANTE ICON: RIGID ANCHORING */
+        /* DANTE ICON: MATHEMATICALLY PINNED TO SIDEBAR */
         #dante-avatar-pedestal {
             position: absolute;
             top: -85px;
@@ -174,11 +177,11 @@
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
         }
 
-        /* GRID SURFACE: NO-STRETCH ASPECT RATIO LOCK */
+        /* THE GRID SURFACE: ASPECT RATIO LOCK (STRETCH-PROOF) */
         #grid-frame-boundary {
             position: relative;
             height: 100%;
-            aspect-ratio: 10 / 20; /* Perfect Circular Lock */
+            aspect-ratio: 10 / 20; /* Absolute Vertical Fix */
             border: 8px solid #FFF;
             border-radius: 48px;
             background: rgba(0, 0, 0, 0.5);
@@ -194,7 +197,7 @@
             display: block;
         }
 
-        /* --- V. STATE OVERLAY MODULES --- */
+        /* --- V. CINEMATIC OVERLAY SYSTEM (THE SLOP KILLER) --- */
         .native-full-screen-state {
             position: absolute;
             inset: 0;
@@ -212,6 +215,7 @@
 
         #state-intro-menu { background: linear-gradient(135deg, var(--color-roblox-blue), #003657); }
         
+        /* Narrative Panel Fix - Guarantees full clearance on continue */
         #state-narrative-panel { 
             background: rgba(0, 0, 0, 0.95); 
             display: none; 
@@ -243,7 +247,7 @@
             box-shadow: 0 25px 65px rgba(0,0,0,0.9);
         }
 
-        /* --- VI. INTERACTION SHELF (BOTTOM - HOME BAR SAFE) --- */
+        /* --- VI. INTERACTION FOOTER (iOS HOME BAR PROTECTED) --- */
         #interaction-control-footer {
             height: 18vh;
             width: 100%;
@@ -276,12 +280,12 @@
         }
         .shelf-action-btn:active { transform: translateY(6px); box-shadow: 0 8px 0px #004b78; }
 
-        /* YOUWIN.PNG STORE ICON INTEGRATION */
+        /* HELLO KITTY STORE ICON (YOUWIN.PNG) INTEGRATION */
         #kitty-store-img-node {
             width: 95px;
             height: auto;
             pointer-events: none;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
         }
 
         #rotate-icon-node {
@@ -290,7 +294,7 @@
             filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
         }
 
-        /* SYSTEM TOOLS */
+        /* SYSTEM UTILITIES */
         #mute-switch-btn { position: absolute; top: calc(var(--safe-area-top) + 20px); right: 25px; z-index: 10000; font-size: 34px; cursor: pointer; }
         #pause-switch-btn { position: absolute; top: calc(var(--safe-area-top) + 20px); left: 25px; z-index: 10000; font-size: 34px; cursor: pointer; }
     </style>
@@ -301,13 +305,13 @@
     <div id="mute-switch-btn" onclick="toggleNativeMute()">🔊</div>
     <div id="pause-switch-btn" onclick="requestSystemPause()">⏸️</div>
 
-    <div class="roblox-cloud-element" style="width:240px; height:65px; top:18%; animation: driftAnimMain 42s linear infinite;"></div>
-    <div class="roblox-cloud-element" style="width:340px; height:90px; top:48%; animation: driftAnimMain 65s linear reverse infinite;"></div>
+    <div class="sky-drift-element" style="width:240px; height:65px; top:18%; animation: driftAnimMain 42s linear infinite;"></div>
+    <div class="sky-drift-element" style="width:340px; height:90px; top:48%; animation: driftAnimMain 65s linear reverse infinite;"></div>
 
     <div id="state-intro-menu" class="native-full-screen-state">
-        <div style="background: var(--glass-panel); padding: 50px; border-radius: 60px; border: 4.5px solid var(--color-glass-border); backdrop-filter: blur(25px);">
-            <img src="Dante_App_Logo.png" style="width:230px; margin-bottom:35px; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.7));">
-            <h1 style="font-size: 72px; margin: 0; letter-spacing: 6px; color: white;">DANTE'S RINGS</h1>
+        <div style="background: var(--color-glass-heavy); padding: 50px; border-radius: 60px; border: 5px solid var(--color-glass-border); backdrop-filter: blur(25px);">
+            <img src="Dante_App_Logo.png" id="intro-logo" style="width:230px; margin-bottom:35px; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.7));">
+            <h1 style="font-size: 72px; margin: 0; letter-spacing: 6px; color: white; text-shadow: 0 0 20px rgba(0,162,255,0.6);">DANTE'S RINGS</h1>
             <p style="font-size: 26px; color: var(--color-roblox-blue); margin-bottom: 50px;">A Future Vibrant Self Adventure</p>
             <button class="production-app-btn" onclick="initiateAdventureSession()">START ADVENTURE</button>
         </div>
@@ -373,23 +377,23 @@ const MasterConfig = {
     GridGeometry: { COLS: 10, ROWS: 20, SCALE: 20 },
     ColorPalette: [
         null,
-        '#FFB7C5', // 1: Macaron Pink
-        '#FFDAB9', // 2: Macaron Peach
-        '#E6E6FA', // 3: Macaron Lavender
-        '#BFFFD9', // 4: Macaron Mint
-        '#FF69B4', // 5: Macaron Hot Pink
-        '#87CEEB', // 6: Macaron Sky Blue
-        '#FFD700'  // 7: Macaron Gold
+        '#FFB7C5', // 1: Cherry Blossom
+        '#FFDAB9', // 2: Peach Puff
+        '#E6E6FA', // 3: Periwinkle
+        '#BFFFD9', // 4: Mint Jewel
+        '#FF69B4', // 5: Rose Neon
+        '#87CEEB', // 6: Sky Jewel
+        '#FFD700'  // 7: Gold Nugget
     ],
     NarrativeLessons: [
-        "LEVEL 1 TUTORIAL: Drag to Move. Tap to Spin. The Kitty button stores your ring. Clear 10 to evolve.",
+        "LEVEL 1 TUTORIAL: Breathe beneath the surface. Drag to move. Tap to Spin. Store rings in the Kitty button. Clear 10 to evolve.",
         "Pandora: Dante discovers curiosity. The patterns of self become more colorful.",
         "Minecraft: Dante learns he can rebuild anything he breaks, piece by piece.",
         "Legoworld: Dante finds joy in play. Structure is his foundation.",
         "Rainforest: Dante trusts growth he cannot see yet. Keep ascending.",
         "Outer Space: Dante finds stillness in the vast unknown.",
         "Jungle: Dante follows instinct. He moves with nature, not against it.",
-        "School: Dante learns that every mis-drop is a lesson to be mastered.",
+        "School: Dante realizes every mis-drop is a lesson to be mastered.",
         "Sun Surface: Dante holds his shape in the high heat of transformation.",
         "Dream World: Dante wakes up inside his own imagination. The Self is complete."
     ],
@@ -424,10 +428,10 @@ const SystemRefs = {
     linesText: document.getElementById('val-node-lines'),
     meterFill: document.getElementById('progress-meter-fill'),
     worldDisplay: document.getElementById('world-label-display'),
-    avatarPedestal: document.getElementById('dante-avatar-pedestal')
+    avatarPedestal: document.getElementById('dante-avatar-anchor')
 };
 
-// Apply Device Resolution Scaling
+// Apply Hardware Pixel Scaling
 SystemRefs.ctx.scale(MasterConfig.GridGeometry.SCALE, MasterConfig.GridGeometry.SCALE);
 SystemRefs.holdCtx.scale(12, 12);
 SystemRefs.nextCtx.scale(12, 12);
@@ -447,7 +451,7 @@ const NativeAudioController = {
         this.isUnlocked = true;
     },
 
-    playTheme() { if (!this.isMuted) this.soundtrack.play().catch(() => {}); },
+    playTheme() { if (!this.isMuted) this.soundtrack.play().catch(e => {}); },
     pauseTheme() { this.soundtrack.pause(); },
 
     playTonalSfx(freq, wave, dur) {
@@ -539,7 +543,7 @@ const CoreEngine = {
     timestampLast: 0,
     activeInterval: 1000,
     
-    // TUCK LOGIC: Lock Delay Subsystem
+    // LOCK DELAY SUBSYSTEM: For sliding pieces under ledges
     lockTimerActive: 0,
     LOCK_DELAY_DURATION: 500,
 
@@ -573,7 +577,7 @@ const CoreEngine = {
         this.isHoldOk = true;
         
         if (this.detectCollision()) {
-            NativeAudioController.playTonalSfx(150, 'sawtooth', 0.7);
+            NativeAudioController.playTonalSfx(150, 'sawtooth', 0.8);
             this.triggerUINotification("STACKED OUT!", "Breathe. notice the pattern you're building.", false);
         }
     },
@@ -619,7 +623,7 @@ const CoreEngine = {
         if (clearedCount > 0) {
             this.linesClearedTotal += clearedCount;
             this.activePlayer.score += clearedCount * 10;
-            this.hapticShakeStr = 18; 
+            this.hapticShakeStr = 22; 
             NativeAudioController.playTonalSfx(523, 'sine', 0.25);
             this.updateHUD();
             this.performDanteJump();
@@ -635,13 +639,12 @@ const CoreEngine = {
         const percentage = Math.max(0, Math.min(100, ((this.linesClearedTotal - prevTarget) / (worldData.target - prevTarget) * 100)));
         SystemRefs.meterFill.style.width = percentage + '%';
 
-        // WIN CHECK
+        // NARRATIVE LEVEL UP CHECK (Every 10 lines for onboarding)
         if (this.currentLevelIndex === MasterConfig.AdventureWorlds.length - 1 && this.linesClearedTotal >= worldData.target) {
-            this.triggerUINotification("DREAM WORLD REACHED!", "The journey to your Future Vibrant Self is achieved.", true);
+            this.triggerUINotification("DREAM WORLD REACHED!", "Dante is home in his imagination.", true);
             return;
         }
         
-        // NARRATIVE LEVEL UP CHECK
         if (this.linesClearedTotal >= worldData.target && this.currentLevelIndex < MasterConfig.AdventureWorlds.length - 1) {
             this.currentLevelIndex++;
             this.activeInterval = MasterConfig.AdventureWorlds[this.currentLevelIndex].speed;
@@ -652,7 +655,7 @@ const CoreEngine = {
     },
 
     performDanteJump() {
-        SystemRefs.avatarPedestal.style.transform = 'scale(2.2) translateY(-60px)';
+        SystemRefs.avatarPedestal.style.transform = 'scale(2.3) translateY(-65px)';
         setTimeout(() => SystemRefs.avatarPedestal.style.transform = 'scale(1) translateY(0)', 450);
     },
 
@@ -667,7 +670,7 @@ const CoreEngine = {
     },
 
     /**
-     * MAIN ENGINE LOOP
+     * MAIN ENGINE LOOP (60FPS Target)
      */
     mainTick(timestamp = 0) {
         if (this.isSystemPaused) return;
@@ -704,7 +707,7 @@ const CoreEngine = {
                 NativeAudioController.playTonalSfx(200, 'sine', 0.15);
             }
         } else {
-            this.lockTimerActive = 0; // Reset timer if the piece moved horizontally off a ledge
+            this.lockTimerActive = 0; 
         }
         FXModule.pushStreakFrame(this.activePlayer.matrix, this.activePlayer.pos);
     },
@@ -713,21 +716,21 @@ const CoreEngine = {
         // 1. Calculate Haptic Shake
         let ox = 0, oy = 0;
         if (this.hapticShakeStr > 0) {
-            ox = (Math.random() - 0.5) * this.hapticShakeStr * 0.25;
-            oy = (Math.random() - 0.5) * this.hapticShakeStr * 0.25;
-            this.hapticShakeStr *= 0.86;
+            ox = (Math.random() - 0.5) * this.hapticShakeStr * 0.28;
+            oy = (Math.random() - 0.5) * this.hapticShakeStr * 0.28;
+            this.hapticShakeStr *= 0.85;
         }
 
         SystemRefs.ctx.save();
         SystemRefs.ctx.translate(ox, oy);
         
-        // 2. Scene Layer: Theme Background
+        // 2. Clear Scene & Draw Theme Backdrop
         SystemRefs.ctx.fillStyle = MasterConfig.AdventureWorlds[this.currentLevelIndex].bg;
         SystemRefs.ctx.fillRect(0, 0, SystemRefs.canvas.width, SystemRefs.canvas.height);
         
-        // 3. System Layer: Roblox Grid Base
+        // 3. Grid Lines
         SystemRefs.ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
-        SystemRefs.ctx.lineWidth = 0.045;
+        SystemRefs.ctx.lineWidth = 0.05;
         for(let x=0; x<=MasterConfig.GridGeometry.COLS; x++) { 
             SystemRefs.ctx.beginPath(); SystemRefs.ctx.moveTo(x,0); SystemRefs.ctx.lineTo(x,MasterConfig.GridGeometry.ROWS); SystemRefs.ctx.stroke(); 
         }
@@ -735,11 +738,11 @@ const CoreEngine = {
             SystemRefs.ctx.beginPath(); SystemRefs.ctx.moveTo(0,y); SystemRefs.ctx.lineTo(MasterConfig.GridGeometry.COLS,y); SystemRefs.ctx.stroke(); 
         }
 
-        // 4. Object Layer: Static Grid
+        // 4. Static Content Render
         this.renderMatrix(SystemRefs.ctx, this.arena, {x:0, y:0});
         
         if (this.activePlayer.matrix) {
-            // 5. Physics Layer: Ghost shadow
+            // 5. Aiming Shadow
             const ghostPos = { x: this.activePlayer.pos.x, y: this.activePlayer.pos.y };
             while (!this.detectCollision(this.arena, { pos: ghostPos, matrix: this.activePlayer.matrix })) {
                 ghostPos.y++;
@@ -747,17 +750,17 @@ const CoreEngine = {
             ghostPos.y--;
             this.renderMatrix(SystemRefs.ctx, this.activePlayer.matrix, ghostPos, true);
             
-            // 6. Object Layer: Active Falling piece
+            // 6. Active Falling piece
             this.renderMatrix(SystemRefs.ctx, this.activePlayer.matrix, this.activePlayer.pos);
         }
 
-        // 7. Visual Layer: FX Cycle
+        // 7. Visual FX Pipeline
         FXModule.update();
         FXModule.render(SystemRefs.ctx);
         
         SystemRefs.ctx.restore();
 
-        // 8. HUD Layer: Component Draws
+        // 8. Sidebar Previews
         SystemRefs.nextCtx.clearRect(0,0,5,5); 
         this.renderMatrix(SystemRefs.nextCtx, this.pieceNext, {x:0, y:0});
         
@@ -767,13 +770,12 @@ const CoreEngine = {
         }
     },
 
-    renderBlockAsset(c, px, py, colorIdx, isGhost) {
+    renderBlockCandy(c, px, py, colorIdx, isGhost) {
         c.globalAlpha = isGhost ? 0.35 : 1.0;
         const cx = px + 0.5; const cy = py + 0.5;
-        
         const baseColor = MasterConfig.ColorPalette[colorIdx];
         
-        // HELLO KITTY BRAND LOGIC (Color 1 Pink, Color 2 Peach)
+        // HELLO KITTY EAR RENDERING (On Type 1 and 2 Rings)
         if (!isGhost && (colorIdx === 1 || colorIdx === 2)) {
             c.fillStyle = baseColor;
             c.beginPath(); c.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
@@ -783,16 +785,16 @@ const CoreEngine = {
         // CORE RING JEWELRY
         c.beginPath(); c.arc(cx, cy, 0.44, 0, Math.PI * 2);
         
-        // Complex Jewel Gradient
+        // Triple-Radial Candy Crush Gradient
         const gradient = c.createRadialGradient(cx-0.1, cy-0.1, 0.05, cx, cy, 0.48);
-        gradient.addColorStop(0, 'white');
+        gradient.addColorStop(0, 'white'); // Gloss
         gradient.addColorStop(0.3, baseColor);
-        gradient.addColorStop(1, 'rgba(0,0,0,0.4)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.4)'); // Deep shadow
         
         c.fillStyle = gradient;
         c.fill();
         c.strokeStyle = 'white';
-        c.lineWidth = 0.07;
+        c.lineWidth = 0.08;
         c.stroke();
         
         c.globalAlpha = 1.0;
@@ -801,7 +803,7 @@ const CoreEngine = {
     renderMatrix(ctxTarget, matrixData, offsetPos, asGhost = false) {
         if (!matrixData) return;
         matrixData.forEach((row, y) => row.forEach((val, x) => {
-            if (val !== 0) this.renderBlockAsset(ctxTarget, x + offsetPos.x, y + offsetPos.y, val, asGhost);
+            if (val !== 0) this.renderBlockCandy(ctxTarget, x + offsetPos.x, y + offsetPos.y, val, asGhost);
         }));
     }
 };
@@ -823,7 +825,7 @@ SystemRefs.canvas.addEventListener('touchmove', e => {
     if (Math.abs(diffX) > 12 || Math.abs(diffY) > 12) isSwipeActive = true;
 
     // Movement Trigger
-    if (Math.abs(diffX) > 38) {
+    if (Math.abs(diffX) > 40) {
         const direction = diffX > 0 ? 1 : -1;
         CoreEngine.activePlayer.pos.x += direction;
         if (CoreEngine.detectCollision()) {
@@ -833,7 +835,7 @@ SystemRefs.canvas.addEventListener('touchmove', e => {
         }
         startX = currX;
     }
-    // Descent Trigger
+    // Descent Trigger (Pull Down)
     if (diffY > 65) CoreEngine.activeInterval = 45;
 }, {passive: false});
 
@@ -848,7 +850,7 @@ SystemRefs.canvas.addEventListener('touchend', () => {
 
 function requestSystemPause() {
     if (CoreEngine.isSystemPaused) return;
-    CoreEngine.triggerUINotification("PAUSED", "Take a breath. Reconnect with your Future Vibrant Self.", false);
+    CoreEngine.triggerUINotification("PAUSED", "Reconnect with your Future Vibrant Self.", false);
 }
 
 function requestActiveHold() {
@@ -864,7 +866,7 @@ function requestActiveHold() {
         CoreEngine.activePlayer.pos.x = (MasterConfig.GridGeometry.COLS / 2 | 0) - (CoreEngine.activePlayer.matrix[0].length / 2 | 0);
     }
     CoreEngine.isHoldOk = false;
-    NativeAudioController.playTonalSfx(300, 'sine', 0.12);
+    NativeAudioController.playTonalSfx(300, 'sine', 0.15);
 }
 
 function performRotateAction() {
@@ -906,9 +908,9 @@ function handleNarrativeClose() {
     }
 }
 
-// Initial Core Prerender
+// Initial Prerender
 CoreEngine.fullSceneRender();
-console.log("PRODUCTION ENGINE V12.0 ACTIVE (SLOP-ZERO MASTER).");
+console.log("ENGINE V15.0 ACTIVE (SLOP-ZERO DEFINITIVE MASTER).");
 </script>
 </body>
 </html>

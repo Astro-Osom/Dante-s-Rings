@@ -4,53 +4,77 @@
     <title>Dante's Rings</title>
     <link rel="apple-touch-icon" href="Dante_App_Logo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         :root { --accent: #FF1493; }
-        body { transition: background 1s ease; font-family: 'Comic Sans MS', sans-serif; overflow: hidden; touch-action: none; margin: 0; display: flex; flex-direction: column; align-items: center; background: #87CEEB; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        #ui-header { margin-top: 10px; text-align: center; z-index: 10; }
-        #main-layout { display: flex; align-items: flex-start; gap: 10px; margin-top: 5px; position: relative; }
-        .sidebar { display: flex; flex-direction: column; gap: 5px; width: 70px; }
-        .box { background: rgba(255, 255, 255, 0.3); border: 3px solid #FFF; border-radius: 12px; height: 70px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #game-container { position: relative; border: 6px solid #FFF; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: #000; overflow: hidden; }
-        canvas { display: block; border-radius: 18px; }
-        #dante-character { position: absolute; left: -95px; bottom: 10px; width: 90px; height: 90px; background-image: url('Dante_App_Logo.png'); background-size: contain; background-repeat: no-repeat; transition: 0.2s; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
-        #progress-container { width: 200px; height: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; margin: 5px 0; border: 2px solid #FFF; overflow: hidden; }
+        body { 
+            transition: background 1s ease; font-family: 'Comic Sans MS', sans-serif; 
+            overflow: hidden; touch-action: none; margin: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            background: #87CEEB; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            height: 100vh; width: 100vw;
+        }
+        #ui-header { width: 100%; text-align: center; padding-top: 5px; z-index: 10; }
+        
+        /* New Layout: Maximize Game Space */
+        #main-layout { 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 5px; width: 98%; height: 75vh; position: relative; 
+        }
+        
+        .sidebar { display: flex; flex-direction: column; gap: 5px; width: 60px; height: 100%; justify-content: center; }
+        .box { background: rgba(255, 255, 255, 0.3); border: 3px solid #FFF; border-radius: 12px; height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .box-label { font-size: 10px; font-weight: bold; text-align: center; }
+
+        #game-container { 
+            position: relative; height: 100%; border: 6px solid #FFF; 
+            border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            background: #000; overflow: hidden; display: flex;
+        }
+        canvas#tetris { height: 100%; width: auto; aspect-ratio: 1 / 2; display: block; border-radius: 18px; }
+        
+        #dante-character-box { position: absolute; left: 5px; bottom: 5px; width: 60px; height: 60px; z-index: 5; }
+        #dante-character-box img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); transition: 0.2s; }
+
+        #progress-container { width: 80%; height: 10px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 2px solid #FFF; overflow: hidden; margin-bottom: 5px; }
         #progress-fill { width: 0%; height: 100%; background: #39FF14; transition: width 0.3s; }
-        .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 10px; width: 95%; max-width: 450px; }
-        button { height: 65px; border-radius: 15px; border: none; background: #FFF; font-size: 26px; box-shadow: 0 6px #CCC; cursor: pointer; }
-        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; border-radius: 18px; z-index: 50; padding: 20px; box-sizing: border-box; text-align: center; }
-        #mute-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: 2px solid #FFF; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; }
-        #win-image { width: 180px; height: auto; margin-bottom: 15px; display: none; border-radius: 15px; }
+
+        .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; width: 100%; max-width: 500px; height: 15vh; }
+        button { height: 100%; border-radius: 15px; border: none; background: #FFF; font-size: 24px; box-shadow: 0 4px #CCC; cursor: pointer; }
+        #mute-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: 2px solid #FFF; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; display: flex; align-items: center; justify-content: center; z-index: 100; }
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; border-radius: 18px; z-index: 50; padding: 10px; box-sizing: border-box; text-align: center; }
+        #win-image { width: 150px; height: auto; margin-bottom: 10px; display: none; border-radius: 15px; }
     </style>
 </head>
-<body>
+<body onpointerdown="unlockAudio()">
 
     <div id="mute-btn" onclick="toggleMute()">🔊</div>
 
     <div id="ui-header">
         <b id="level-title">Underwater World</b><br>
-        <small>Score: <span id="score">0</span> | Next Level in: <span id="lines-left">30</span></small>
+        <small style="font-size: 12px;">Score: <span id="score">0</span> | Next Level in: <span id="lines-left">30</span></small>
     </div>
+
     <div id="progress-container"><div id="progress-fill"></div></div>
     
     <div id="main-layout">
         <div class="sidebar">
-            <div class="box-label" style="font-size:10px">Hold</div>
+            <div class="box-label">Hold</div>
             <div class="box"><canvas id="hold-canvas" width="50" height="50"></canvas></div>
         </div>
         <div id="game-container">
-            <div id="dante-character"></div>
+            <div id="dante-character-box"><img src="Dante_App_Logo.png" id="dante-img"></div>
             <canvas id="tetris" width="200" height="400"></canvas>
             <div id="overlay">
                 <img id="win-image" src="Youwin.png">
-                <h2 id="overlay-title">PAUSED</h2>
-                <p id="overlay-text" style="max-width: 260px; font-size: 14px; line-height: 1.4;"></p>
-                <button id="overlay-button" onclick="overlayPrimaryAction()" style="width: 140px; height: 45px; font-size: 18px;">RESUME</button>
+                <h2 id="overlay-title" style="margin:5px">PAUSED</h2>
+                <p id="overlay-text" style="max-width: 180px; font-size: 12px; line-height: 1.3; margin:5px"></p>
+                <button id="overlay-button" onclick="overlayPrimaryAction()" style="width: 120px; height: 40px; font-size: 16px;">RESUME</button>
             </div>
         </div>
         <div class="sidebar">
-            <div class="box-label" style="font-size:10px">Next</div>
+            <div class="box-label">Next</div>
             <div class="box"><canvas id="next-canvas" width="50" height="50"></canvas></div>
         </div>
     </div>
@@ -64,24 +88,21 @@
     </div>
 
 <script>
-// --- AUDIO ENGINE ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const bgMusic = new Audio('Dantesgamemusic.mp4');
+// FIXED PATH: Extension changed from .mp4 to .m4a
+const bgMusic = new Audio('Dantesgamemusic.m4a');
 bgMusic.loop = true; bgMusic.volume = 0.4;
 let audioUnlocked = false; let isMuted = false;
 
 function unlockAudio() { 
     if (!audioUnlocked) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        bgMusic.play().catch(e => console.log("Audio ready"));
+        bgMusic.play().catch(e => console.log("Waiting for user interaction..."));
         audioUnlocked = true;
     }
 }
 
-function toggleMute() {
-    isMuted = !isMuted; bgMusic.muted = isMuted;
-    document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊';
-}
+function toggleMute() { isMuted = !isMuted; bgMusic.muted = isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; }
 
 function playTone(freq, type, duration) {
     if (!audioUnlocked || isMuted) return;
@@ -93,7 +114,6 @@ function playTone(freq, type, duration) {
     osc.start(); osc.stop(audioCtx.currentTime + duration);
 }
 
-// --- STORY & THEMES ---
 const ringStory = [
     "Underwater: Dante learns to breathe beneath the surface of his own feelings.",
     "Pandora: Curiosity opens new colors in Dante's sky.",
@@ -123,12 +143,11 @@ const themes = [
 const colors = [null, '#FF1493', '#FFEA00', '#A020F0', '#00E5FF', '#FF4500', '#39FF14', '#FF0000'];
 let clouds = [ {x: 2, y: 3, s: 1.5, d: 0.005}, {x: 8, y: 6, s: 1.2, d: 0.008}, {x: 1, y: 12, s: 1.8, d: 0.004} ];
 
-// --- GAMEPLAY CORE ---
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 const hctx = document.getElementById('hold-canvas').getContext('2d');
 const nctx = document.getElementById('next-canvas').getContext('2d');
-const danteChar = document.getElementById('dante-character');
+const danteImg = document.getElementById('dante-img');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayText = document.getElementById('overlay-text');
@@ -143,14 +162,14 @@ function draw() {
     context.fillStyle = themes[currentLevelIndex].bg;
     context.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Living Sky Cloud Drift
+    // Cloud Drift
     clouds.forEach(c => {
         c.x += c.d; if (c.x > GRID_W + 2) c.x = -4;
-        context.fillStyle = "rgba(255, 255, 255, 0.4)";
+        context.fillStyle = "rgba(255, 255, 255, 0.3)";
         context.beginPath(); context.arc(c.x, c.y, c.s, 0, Math.PI * 2); context.fill();
     });
 
-    // Full Guide Grid
+    // Guide Grid
     context.strokeStyle = "rgba(255, 255, 255, 0.15)"; context.lineWidth = 0.02;
     for (let x = 0; x <= GRID_W; x++) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, GRID_H); context.stroke(); }
     for (let y = 0; y <= GRID_H; y++) { context.beginPath(); context.moveTo(0, y); context.lineTo(GRID_W, y); context.stroke(); }
@@ -168,7 +187,6 @@ function draw() {
 function drawRing(ctx, x, y, value, isGhost = false) {
     ctx.globalAlpha = isGhost ? 0.3 : 1;
     const cx = x + 0.5, cy = y + 0.5;
-    // Hello Kitty Details
     if (!isGhost && (value === 1 || value === 2)) {
         ctx.fillStyle = colors[value];
         ctx.beginPath(); ctx.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); ctx.fill();
@@ -196,8 +214,8 @@ function arenaSweep() {
         totalLines += rowCount; player.score += rowCount * 10;
         playTone(440 + (rowCount * 100), 'sine', 0.3);
         updateUI();
-        danteChar.style.transform = 'scale(1.3) translateY(-20px)';
-        setTimeout(() => danteChar.style.transform = 'scale(1) translateY(0)', 300);
+        danteImg.style.transform = 'scale(1.3) translateY(-10px)';
+        setTimeout(() => danteImg.style.transform = 'scale(1) translateY(0)', 300);
     }
 }
 
@@ -246,7 +264,6 @@ function showGameOverOverlay() {
     overlay.style.display = 'flex';
 }
 
-// Soft Reset Logic
 function softReset() {
     arena.forEach(row => row.fill(0));
     totalLines = 0; player.score = 0; currentLevelIndex = 0;
@@ -368,7 +385,6 @@ const arena = Array.from({length: GRID_H}, () => Array(GRID_W).fill(0));
 const player = { pos: {x: 0, y: 0}, matrix: null, score: 0 };
 let nextPiece = null, heldPiece = null, canHold = true, totalLines = 0, currentLevelIndex = 0;
 
-document.body.addEventListener('pointerdown', unlockAudio, { once: true });
 playerReset(); update();
 </script>
 </body>

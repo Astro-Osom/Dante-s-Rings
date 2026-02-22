@@ -10,19 +10,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <style>
-        /* --- I. PRODUCTION TOKENS --- */
+        /* --- I. DESIGN SYSTEM TOKENS --- */
         :root {
             --roblox-blue: #00A2FF;
             --roblox-green: #00E676;
-            --vibrant-pink: #FF1493;
-            --vibrant-yellow: #FFD700;
-            --glass-panel: rgba(0, 0, 0, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.3);
+            --kitty-pink: #FFB7C5;
+            --kitty-red: #FF0000;
+            --glass-bg: rgba(0, 0, 0, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.35);
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        /* --- II. UNIVERSAL LAYOUT (THE SLOP-KILLER) --- */
+        /* --- II. MASTER LAYOUT (CENTERED & NOTCH-AWARE) --- */
         body {
             margin: 0; padding: 0; overflow: hidden;
             background: #000 url('Roblox_Bg.jpg') no-repeat center center fixed;
@@ -31,42 +31,42 @@
             touch-action: none; display: flex; flex-direction: column;
             height: 100vh; width: 100vw;
             user-select: none; -webkit-user-select: none;
-            transition: background 2s ease-in-out;
+            transition: background 2s ease;
         }
 
-        /* ROBLOX SKY BOX */
-        .vibrant-cloud {
-            position: absolute; background: rgba(255, 255, 255, 0.8);
+        /* ROBLOX ENVIRONMENTAL DRIFT */
+        .sky-cloud {
+            position: absolute; background: rgba(255, 255, 255, 0.85);
             border-radius: 15px; z-index: 1; pointer-events: none;
         }
-        @keyframes cloudFloat {
-            from { transform: translateX(-400px); }
+        @keyframes cloudDrift {
+            from { transform: translateX(-450px); }
             to { transform: translateX(110vw); }
         }
 
-        /* --- III. APP HEADER (FIXED - NOTCH PROTECTED) --- */
+        /* --- III. PRODUCTION HUD (FIXED TOP) --- */
         #production-header {
             padding-top: calc(var(--safe-top) + 10px);
             height: 18vh; width: 100%; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            z-index: 2000; border-bottom: 2.5px solid var(--glass-border);
+            z-index: 3000; border-bottom: 2px solid var(--glass-border);
             box-shadow: 0 5px 30px rgba(0,0,0,0.6); box-sizing: border-box;
         }
 
-        #world-label {
-            font-size: clamp(22px, 6vw, 34px); font-weight: 900;
+        #world-name-label {
+            font-size: clamp(22px, 7vw, 34px); font-weight: 900;
             text-transform: uppercase; letter-spacing: 4px;
             color: var(--roblox-blue); text-shadow: 0 0 15px rgba(0, 162, 255, 0.8);
         }
 
-        .hud-stats-shelf {
-            display: flex; gap: 20px; font-size: 16px; font-weight: 700;
-            margin: 4px 0 8px 0; letter-spacing: 1.5px;
+        .hud-stats-group {
+            display: flex; gap: 30px; font-size: 18px; font-weight: 700;
+            margin: 5px 0 10px 0; letter-spacing: 1.5px;
         }
 
-        #meter-container {
+        #meter-track {
             width: 75%; height: 12px; background: rgba(255, 255, 255, 0.15);
             border: 2px solid white; border-radius: 12px;
             overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
@@ -78,8 +78,8 @@
             transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* --- IV. MASTER INTERACTION STAGE --- */
-        #interaction-viewport {
+        /* --- IV. MASTER STAGE (CENTERED GAMEPLAY) --- */
+        #main-stage-viewport {
             flex: 1; width: 100%; display: flex;
             justify-content: center; align-items: center;
             gap: 15px; position: relative; z-index: 1000;
@@ -88,25 +88,25 @@
 
         .viewport-sidebar {
             display: flex; flex-direction: column; justify-content: center;
-            align-items: center; gap: 15px; width: 18vw; max-width: 95px;
+            align-items: center; gap: 12px; width: 18vw; max-width: 95px;
         }
 
-        .sidebar-title {
+        .sidebar-tag {
             font-size: 10px; font-weight: 900; color: rgba(255,255,255,0.4);
             text-transform: uppercase; letter-spacing: 1.5px;
         }
 
-        .module-pedestal {
+        .module-box {
             background: var(--glass-panel); border: 4px solid #FFF;
             border-radius: 25px; width: 85px; height: 85px;
             display: flex; align-items: center; justify-content: center;
             position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
         }
 
-        /* DANTE CHARACTER AVATAR: MATHEMATICALLY PINNED */
+        /* DANTE CHARACTER AVATAR: RIGID PINNING */
         #dante-avatar-anchor {
             position: absolute; top: -85px; width: 75px; height: 75px;
-            z-index: 1100; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1500; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: block;
         }
         #dante-avatar-anchor img {
@@ -114,121 +114,141 @@
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
         }
 
-        /* THE GRID Surface: PORTRAIT LOCK */
-        #grid-frame-node {
-            position: relative; height: 96%; aspect-ratio: 10 / 20;
-            border: 6px solid #FFF; border-radius: 38px;
+        /* THE GRID Frame: NO-STRETCH ASPECT RATIO LOCK */
+        #grid-frame-container {
+            position: relative; height: 98%; aspect-ratio: 10 / 20;
+            border: 6px solid #FFF; border-radius: 40px;
             background: rgba(0, 0, 0, 0.45); overflow: hidden;
             box-shadow: 0 30px 80px rgba(0,0,0,0.8);
             display: flex; align-items: center; justify-content: center;
         }
-        canvas#production-surface { width: 100%; height: 100%; display: block; }
+        canvas#master-production-surface { width: 100%; height: 100%; display: block; }
 
-        /* --- V. STATE OVERLAYS (NATIVE PRODUCTION) --- */
-        .native-overlay {
+        /* --- V. PRODUCTION OVERLAY SYSTEM --- */
+        .native-full-overlay {
             position: absolute; inset: 0; z-index: 5000;
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; text-align: center; padding: 40px;
-            box-sizing: border-box; backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            box-sizing: border-box; backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
         }
 
-        #state-menu { background: linear-gradient(135deg, var(--roblox-blue), #003e63); }
-        #state-narrative { background: rgba(0, 0, 0, 0.95); display: none; }
+        #state-menu { background: linear-gradient(135deg, var(--roblox-blue), #003a5c); }
+        #state-narrative { background: rgba(0, 0, 0, 0.96); display: none; }
 
         .app-action-btn {
-            padding: 24px 60px; background: var(--roblox-green);
+            padding: 24px 65px; background: var(--roblox-green);
             color: white; border: 6px solid white; border-radius: 80px;
             font-size: 32px; font-weight: 900; text-transform: uppercase;
-            box-shadow: 0 14px 0px #006618; cursor: pointer;
-            transition: transform 0.1s; margin-top: 20px;
+            box-shadow: 0 14px 0px #006b1a; cursor: pointer;
+            transition: transform 0.1s; margin-top: 25px;
         }
-        .app-action-btn:active { transform: translateY(8px); box-shadow: 0 6px 0px #006618; }
+        .app-action-btn:active { transform: translateY(8px); box-shadow: 0 6px 0px #006b1a; }
 
-        #prize-node { width: 280px; border-radius: 35px; border: 8px solid white; margin-bottom: 25px; display: none; }
+        #win-prize-graphic { width: 300px; border-radius: 35px; border: 8px solid white; margin-bottom: 30px; display: none; }
 
-        /* --- VI. INTERACTION SHELF (BOTTOM) --- */
-        #interaction-footer {
-            height: 16vh; width: 100%; display: flex; gap: 40px;
+        /* --- VI. INTERACTION FOOTER --- */
+        #interaction-shelf {
+            height: 18vh; width: 100%; display: flex; gap: 45px;
             justify-content: center; align-items: center;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 3.5px solid var(--border-glass);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 3px solid var(--border-glass);
             padding-bottom: var(--safe-bottom); box-sizing: border-box;
             z-index: 2000;
         }
 
-        .shelf-control-btn {
-            width: 120px; height: 90px; border-radius: 30px;
-            border: 5px solid white;
-            background: linear-gradient(to bottom, var(--roblox-blue), #00619c);
-            font-size: 48px; color: white; box-shadow: 0 12px 0px #004d7c;
+        /* STORE (HOLD) BUTTON: HELLO KITTY THEME */
+        #store-btn {
+            position: relative; overflow: visible;
+        }
+        .kitty-bow {
+            position: absolute; top: -10px; right: -10px;
+            width: 40px; height: 30px; z-index: 10;
+            background: var(--kitty-red); border-radius: 10px;
+            border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .kitty-bow::before, .kitty-bow::after {
+            content: ''; position: absolute; top: 50%; 
+            width: 15px; height: 15px; background: white; border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .kitty-bow::before { left: 5px; } .kitty-bow::after { right: 5px; }
+
+        .shelf-btn {
+            width: 130px; height: 100px; border-radius: 30px;
+            border: 6px solid white;
+            background: linear-gradient(to bottom, var(--roblox-blue), #006dad);
+            font-size: 52px; color: white; box-shadow: 0 14px 0px #004d7c;
             cursor: pointer; display: flex; justify-content: center; align-items: center;
         }
 
-        /* UTILITIES */
-        #mute-btn { position: absolute; top: calc(var(--safe-top) + 15px); right: 25px; z-index: 10000; font-size: 32px; cursor: pointer; }
-        #pause-btn { position: absolute; top: calc(var(--safe-top) + 15px); left: 25px; z-index: 10000; font-size: 32px; cursor: pointer; filter: drop-shadow(0 0 5px black); }
+        /* --- VII. UTILITIES --- */
+        #mute-btn { position: absolute; top: calc(var(--safe-top) + 20px); right: 25px; z-index: 10000; font-size: 34px; cursor: pointer; }
+        #pause-btn { position: absolute; top: calc(var(--safe-top) + 20px); left: 25px; z-index: 10000; font-size: 34px; cursor: pointer; filter: drop-shadow(0 0 5px black); }
     </style>
 </head>
 
-<body onpointerdown="handleAudioInit()">
+<body onpointerdown="handleAudioInitialize()">
 
-    <div id="mute-btn" onclick="toggleMuteGlobal()">🔊</div>
-    <div id="pause-btn" onclick="handlePauseRequest()">⏸️</div>
+    <div id="mute-btn" onclick="toggleGlobalMute()">🔊</div>
+    <div id="pause-btn" onclick="handlePauseTrigger()">⏸️</div>
 
-    <div class="vibrant-cloud" style="width:240px; height:65px; top:18%; animation: cloudFloat 48s linear infinite;"></div>
-    <div class="vibrant-cloud" style="width:340px; height:90px; top:48%; animation: cloudFloat 65s linear reverse infinite;"></div>
+    <div class="sky-cloud" style="width:240px; height:65px; top:15%; animation: cloudDrift 45s linear infinite;"></div>
+    <div class="sky-cloud" style="width:340px; height:95px; top:45%; animation: cloudDrift 62s linear reverse infinite;"></div>
 
-    <div id="state-menu" class="native-overlay">
+    <div id="state-menu" class="native-full-overlay">
         <img src="Dante_App_Logo.png" style="width:240px; margin-bottom:30px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));">
         <h1 style="font-size: 72px; margin: 0; letter-spacing: 5px; text-shadow: 6px 6px 0px rgba(0,0,0,0.4);">DANTE'S RINGS</h1>
-        <p id="high-score-label" style="font-size: 24px; color: #DBF3FF; margin-bottom: 40px;">Best Level Reached: <b id="best-level">1</b></p>
+        <p style="font-size: 28px; color: #CAF0FF; margin-bottom: 50px;">A Future Vibrant Self Adventure</p>
         <button class="app-action-btn" onclick="requestAdventureStart()">START ADVENTURE</button>
     </div>
 
     <div id="production-header">
-        <b id="world-display-label">Underwater World</b>
-        <div class="hud-stats-shelf">
-            <span>SCORE: <b id="ui-score-node">0</b></span>
-            <span>LINES: <b id="ui-lines-node">0</b></span>
+        <b id="world-name-label">Underwater World</b>
+        <div class="hud-stats-row">
+            <span>SCORE: <b id="ui-score-val">0</b></span>
+            <span>LINES: <b id="ui-lines-val">0</b></span>
         </div>
-        <div id="meter-container"><div id="meter-fill"></div></div>
+        <div id="meter-track"><div id="meter-fill"></div></div>
     </div>
     
-    <div id="interaction-viewport">
+    <div id="main-stage-viewport">
         <div class="viewport-sidebar">
-            <span class="sidebar-title">HOLD</span>
-            <div class="viewport-module">
+            <span class="sidebar-tag">HOLD</span>
+            <div class="module-box">
                 <div id="dante-avatar-anchor">
-                    <img src="Dante_App_Logo.png" id="dante-sprite">
+                    <img src="Dante_App_Logo.png" id="dante-sprite-img">
                 </div>
                 <canvas id="canvas-hold-asset" width="50" height="50"></canvas>
             </div>
         </div>
 
-        <div id="grid-frame-node">
-            <canvas id="production-surface" width="200" height="400"></canvas>
+        <div id="grid-frame-container">
+            <canvas id="master-production-surface" width="200" height="400"></canvas>
             
-            <div id="state-narrative" class="native-overlay">
-                <img id="prize-node" src="Youwin.png">
-                <h2 id="ov-msg-title" style="font-size: 58px; color: var(--roblox-blue); margin: 0 0 20px 0;">PAUSED</h2>
-                <p id="ov-msg-body" style="font-size:28px; max-width:480px; line-height: 1.6; margin-bottom: 40px;"></p>
-                <button class="app-action-btn" id="ov-msg-btn" onclick="executeOverlayClose()">CONTINUE</button>
+            <div id="state-narrative" class="native-full-overlay">
+                <img id="win-prize-graphic" src="Youwin.png">
+                <h2 id="msg-ov-title" style="font-size: 58px; color: var(--roblox-blue); margin: 0 0 20px 0;">PAUSED</h2>
+                <p id="msg-ov-body" style="font-size:28px; max-width:480px; line-height: 1.6; margin-bottom: 40px;"></p>
+                <button class="app-action-btn" id="msg-ov-btn" onclick="executeOverlayClose()">CONTINUE</button>
             </div>
         </div>
 
         <div class="viewport-sidebar">
-            <span class="sidebar-title">NEXT</span>
-            <div class="viewport-module">
+            <span class="sidebar-tag">NEXT</span>
+            <div class="module-box">
                 <canvas id="canvas-next-asset" width="50" height="50"></canvas>
             </div>
         </div>
     </div>
 
-    <div id="interaction-footer">
-        <button class="shelf-control-btn" onpointerdown="requestPieceHold()">📦</button>
-        <button class="shelf-control-btn" onpointerdown="requestPieceRotate()">🔄</button>
+    <div id="interaction-shelf">
+        <div id="store-btn" class="shelf-btn" onpointerdown="requestPieceHold()">
+            <div class="kitty-bow"></div>
+            📦
+        </div>
+        <button class="shelf-btn" onpointerdown="requestPieceRotate()">🔄</button>
     </div>
 
 <script>
@@ -238,21 +258,21 @@
  * ========================================================================================
  */
 
-// --- I. CORE CONFIGURATION (MODULE A: CONFIG) ---
+// --- I. MASTER CONFIGURATION (MODULE A) ---
 const CONFIG = {
     Engine: { COLS: 10, ROWS: 20, SCALE: 20 },
     Palette: [
-        null, 
-        '#FF1493', // Pink (Hello Kitty)
-        '#FFD700', // Yellow (Hello Kitty)
+        null,
+        '#FF1493', // Pink
+        '#FFD700', // Yellow
         '#A020F0', // Purple
         '#00E5FF', // Cyan
         '#FF4500', // Orange
         '#39FF14', // Green
         '#FF0000'  // Red
     ],
-    Narrative: [
-        "LEVEL 1 TUTORIAL: Tap to Spin. Drag to Move. Press 📦 to Hold. Build your first 30 rings to breathe.",
+    Story: [
+        "LEVEL 1 TUTORIAL: Tap to Spin. Drag to Move. The Bow button (📦) stores your ring. Clear 30 to breathe.",
         "Pandora: Dante discovers curiosity. Patterns become more complex.",
         "Minecraft: Dante learns he can rebuild anything he breaks.",
         "Lego World: Dante finds joy in structure.",
@@ -277,66 +297,52 @@ const CONFIG = {
     ]
 };
 
-// --- II. PRODUCTION REFS (MODULE B: RENDER) ---
+// --- II. PRODUCTION REFS (MODULE B) ---
 const Refs = {
-    canvas: document.getElementById('production-surface'),
-    ctx: document.getElementById('production-surface').getContext('2d'),
+    canvas: document.getElementById('master-production-surface'),
+    ctx: document.getElementById('master-production-surface').getContext('2d'),
     holdCtx: document.getElementById('canvas-hold-asset').getContext('2d'),
     nextCtx: document.getElementById('canvas-next-asset').getContext('2d'),
     
-    ov: document.getElementById('state-narrative'),
-    ovTitle: document.getElementById('ov-msg-title'),
-    ovBody: document.getElementById('ov-msg-body'),
-    ovBtn: document.getElementById('ov-msg-btn'),
-    ovWin: document.getElementById('prize-node'),
+    overlay: document.getElementById('state-narrative'),
+    title: document.getElementById('msg-ov-title'),
+    body: document.getElementById('msg-ov-body'),
+    btn: document.getElementById('msg-ov-btn'),
+    winImg: document.getElementById('win-prize-graphic'),
     
-    score: document.getElementById('ui-score-node'),
-    lines: document.getElementById('ui-lines-node'),
+    scoreUI: document.getElementById('ui-score-val'),
+    linesUI: document.getElementById('ui-lines-val'),
     meter: document.getElementById('meter-fill'),
-    world: document.getElementById('world-display-label'),
-    avatarAnchor: document.getElementById('dante-avatar-anchor')
+    worldUI: document.getElementById('world-name-label'),
+    avatar: document.getElementById('dante-avatar-anchor')
 };
 
-// Initialize High-DPI Scale
+// Apply Static Canvas Resolution
 Refs.ctx.scale(CONFIG.Engine.SCALE, CONFIG.Engine.SCALE);
 Refs.holdCtx.scale(12, 12);
 Refs.nextCtx.scale(12, 12);
 
-// --- III. PERSISTENCE LAYER (MODULE C: DATA) ---
-const PersistentState = {
-    saveBest(level) {
-        const current = localStorage.getItem('dantes_rings_best') || 1;
-        if (level > current) localStorage.setItem('dantes_rings_best', level);
-    },
-    getBest() {
-        return localStorage.getItem('dantes_rings_best') || 1;
-    }
-};
-
-// Update Start Menu with Best level
-document.getElementById('best-level').innerText = PersistentState.getBest();
-
-// --- IV. AUDIO ARCHITECTURE (MODULE D: AUDIO) ---
+// --- III. NATIVE AUDIO (.M4A SYNC) ---
 const AudioEngine = {
     ctx: new (window.AudioContext || window.webkitAudioContext)(),
-    ost: new Audio('Dantesgamemusic.m4a'),
-    ready: false,
+    soundtrack: new Audio('Dantesgamemusic.m4a'),
+    unlocked: false,
     muted: false,
 
     async init() {
-        if (this.ready) return;
+        if (this.unlocked) return;
         if (this.ctx.state === 'suspended') await this.ctx.resume();
-        this.ost.loop = true;
-        this.ost.volume = 0.45;
-        this.ready = true;
-        console.log("AUDIO: Production stream locked.");
+        this.soundtrack.loop = true;
+        this.soundtrack.volume = 0.45;
+        this.unlocked = true;
+        console.log("AUDIO: Production Soundstream Established.");
     },
 
-    playTheme() { if (!this.muted) this.ost.play().catch(e => {}); },
-    pauseTheme() { this.ost.pause(); },
+    playTheme() { if (!this.muted) this.soundtrack.play().catch(e => {}); },
+    pauseTheme() { this.soundtrack.pause(); },
 
     tone(f, type, d) {
-        if (this.muted || !this.ready) return;
+        if (this.muted || !this.unlocked) return;
         const o = this.ctx.createOscillator();
         const g = this.ctx.createGain();
         o.type = type; o.frequency.setValueAtTime(f, this.ctx.currentTime);
@@ -347,19 +353,19 @@ const AudioEngine = {
     }
 };
 
-function handleAudioInit() { AudioEngine.init(); }
-function toggleMuteGlobal() {
+function handleAudioInitialize() { AudioEngine.init(); }
+function toggleGlobalMute() {
     AudioEngine.muted = !AudioEngine.muted;
-    AudioEngine.ost.muted = AudioEngine.muted;
+    AudioEngine.soundtrack.muted = AudioEngine.muted;
     document.getElementById('mute-btn').innerText = AudioEngine.muted ? '🔇' : '🔊';
 }
 
-// --- V. FX PIPELINE: PARTICLES & VIBRANT STREAKS (MODULE E: EFFECTS) ---
-const EffectsEngine = {
+// --- IV. FX PIPELINE: PARTICLES & VIBRANT STREAKS ---
+const FXSystem = {
     particles: [],
     streakHistory: [],
 
-    spawnJuice(x, y, color) {
+    spawnImpact(x, y, color) {
         for (let i = 0; i < 15; i++) {
             this.particles.push({
                 x, y, vx: (Math.random() - 0.5) * 0.9, vy: (Math.random() - 0.5) * 0.9,
@@ -368,7 +374,7 @@ const EffectsEngine = {
         }
     },
 
-    pushStreak(matrix, pos) {
+    pushStreakFrame(matrix, pos) {
         this.streakHistory.push({
             m: JSON.parse(JSON.stringify(matrix)),
             p: { x: pos.x, y: pos.y },
@@ -388,7 +394,7 @@ const EffectsEngine = {
     },
 
     render(c) {
-        // Draw Streaks (Fading movement blur)
+        // A. Draw Vibrant Streaks (Fading Trail)
         this.streakHistory.forEach(t => {
             c.globalAlpha = t.life * 0.22;
             t.m.forEach((row, y) => row.forEach((val, x) => {
@@ -398,7 +404,7 @@ const EffectsEngine = {
                 }
             }));
         });
-        // Draw Explosion Physics
+        // B. Draw Particle Physics
         this.particles.forEach(p => {
             c.globalAlpha = p.life;
             c.fillStyle = p.color;
@@ -408,51 +414,54 @@ const EffectsEngine = {
     }
 };
 
-// --- VI. MASTER ENGINE LOGIC (MODULE F: ENGINE) ---
+// --- V. MASTER ENGINE CORE ---
 const MasterEngine = {
     arena: Array.from({length: CONFIG.Engine.ROWS}, () => Array(CONFIG.Engine.COLS).fill(0)),
     player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
     
     next: null,
     held: null,
-    canHold: true,
-    totalLines: 0,
-    currentLvlIdx: 0,
+    holdReady: true,
+    linesTotal: 0,
+    lvlIndex: 0,
     
     paused: true,
-    dropTimer: 0,
-    lastFrame: 0,
-    dropInterval: 1000,
+    dropCounter: 0,
+    lastTick: 0,
+    interval: 1000,
     
-    hapticShake: 0,
+    shakeStr: 0,
 
+    /**
+     * Initializes engine reset.
+     */
     reset() {
         this.arena.forEach(row => row.fill(0));
-        this.totalLines = 0; this.player.score = 0; this.currentLvlIdx = 0;
+        this.linesTotal = 0; this.player.score = 0; this.lvlIndex = 0;
         this.held = null; this.next = null;
-        this.dropInterval = CONFIG.Worlds[0].speed;
+        this.interval = CONFIG.Worlds[0].speed;
         
         this.refreshHUD();
-        Refs.ov.style.display = 'none';
+        Refs.overlay.style.display = 'none';
         this.paused = false;
         
-        this.respawnPiece();
+        this.spawn();
         AudioEngine.playTheme();
-        requestAnimationFrame(this.mainLoop.bind(this));
+        requestAnimationFrame(this.mainTick.bind(this));
     },
 
-    respawnPiece() {
-        const shapeKeys = 'ILJOTSZ';
-        this.player.matrix = this.next || this.createMatrix(shapeKeys[Math.floor(Math.random() * shapeKeys.length)]);
-        this.next = this.createMatrix(shapeKeys[Math.floor(Math.random() * shapeKeys.length)]);
+    spawn() {
+        const types = 'ILJOTSZ';
+        this.player.matrix = this.next || this.createMatrix(types[Math.floor(Math.random() * types.length)]);
+        this.next = this.createMatrix(types[Math.floor(Math.random() * types.length)]);
         
         this.player.pos.y = 0;
         this.player.pos.x = (CONFIG.Engine.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
-        this.canHold = true;
+        this.holdReady = true;
         
         if (this.collide()) {
             AudioEngine.tone(150, 'sawtooth', 0.7);
-            this.triggerState("STACKED OUT!", "Breathe. notice the pattern you're building. Every step is growth.", false);
+            this.setState("STACKED OUT!", "Breathe. notice the pattern you're building. Every step is growth.", false);
         }
     },
 
@@ -480,118 +489,119 @@ const MasterEngine = {
         this.player.matrix.forEach((row, y) => row.forEach((val, x) => {
             if (val !== 0) {
                 this.arena[y + this.player.pos.y][x + this.player.pos.x] = val;
-                EffectsEngine.spawnJuice(x + this.player.pos.x, y + this.player.pos.y, CONFIG.Palette[val]);
+                FXSystem.spawnImpact(x + this.player.pos.x, y + this.player.pos.y, CONFIG.Palette[val]);
             }
         }));
     },
 
     sweepRows() {
-        let clearedRows = 0;
+        let cleared = 0;
         for (let y = this.arena.length - 1; y >= 0; --y) {
             if (this.arena[y].every(cell => cell !== 0)) {
                 this.arena.splice(y, 1);
                 this.arena.unshift(new Array(CONFIG.Engine.COLS).fill(0));
-                clearedRows++;
+                cleared++;
                 y++; 
             }
         }
-        if (clearedRows > 0) {
-            this.totalLines += clearedRows;
-            this.player.score += clearedRows * 10;
-            this.hapticShake = 18; 
+        if (cleared > 0) {
+            this.linesTotal += cleared;
+            this.player.score += cleared * 10;
+            this.shakeStr = 18; // Production Haptic Value
             AudioEngine.tone(523, 'sine', 0.25);
             this.refreshHUD();
-            this.jumpDante();
+            this.animateAvatarJump();
         }
     },
 
     refreshHUD() {
-        Refs.score.innerText = this.player.score;
-        Refs.lines.innerText = this.totalLines;
+        Refs.scoreUI.innerText = this.player.score;
+        Refs.linesUI.innerText = this.linesTotal;
         
-        const world = CONFIG.Worlds[this.currentLvlIdx];
-        const prev = this.currentLvlIdx > 0 ? CONFIG.Worlds[this.currentLvlIdx - 1].target : 0;
-        const progress = Math.max(0, Math.min(100, ((this.totalLines - prev) / (world.target - prev) * 100)));
-        Refs.meter.style.width = progress + '%';
+        const world = CONFIG.Worlds[this.lvlIndex];
+        const prev = this.lvlIndex > 0 ? CONFIG.Worlds[this.lvlIndex - 1].target : 0;
+        const pct = Math.max(0, Math.min(100, ((this.linesTotal - prev) / (world.target - prev) * 100)));
+        Refs.meter.style.width = pct + '%';
 
-        // Persist Best level
-        PersistentState.saveBest(this.currentLvlIdx + 1);
-
-        // WIN CHECK
-        if (this.currentLvlIdx === CONFIG.Worlds.length - 1 && this.totalLines >= world.target) {
-            this.triggerState("YOU REACHED DREAM WORLD!", "The Self you are rehearsing is complete.", true);
+        // WIN CONDITION CHECK
+        if (this.lvlIndex === CONFIG.Worlds.length - 1 && this.linesTotal >= world.target) {
+            this.setState("YOU REACHED DREAM WORLD!", "Achieved: Dante is home in his own imagination.", true);
             return;
         }
         
-        // LEVEL UP
-        if (this.totalLines >= world.target && this.currentLvlIdx < CONFIG.Worlds.length - 1) {
-            this.currentLvlIdx++;
-            this.dropInterval = CONFIG.Worlds[this.currentLvlIdx].speed;
-            Refs.world.innerText = CONFIG.Worlds[this.currentLvlIdx].name;
+        // LEVEL UP CHECK
+        if (this.linesTotal >= world.target && this.lvlIndex < CONFIG.Worlds.length - 1) {
+            this.lvlIndex++;
+            this.interval = CONFIG.Worlds[this.lvlIndex].speed;
+            Refs.worldUI.innerText = CONFIG.Worlds[this.lvlIndex].name;
             AudioEngine.tone(880, 'square', 0.5);
-            this.triggerState(CONFIG.Worlds[this.currentLvlIdx].name, CONFIG.Narrative[this.currentLvlIdx], false);
+            this.setState(CONFIG.Worlds[this.lvlIndex].name, CONFIG.Story[this.lvlIndex], false);
         }
     },
 
-    jumpDante() {
-        Refs.avatarAnchor.style.transform = 'scale(2.0) translateY(-55px)';
-        setTimeout(() => Refs.avatarAnchor.style.transform = 'scale(1) translateY(0)', 400);
+    animateAvatarJump() {
+        Refs.avatar.style.transform = 'scale(2.0) translateY(-50px)';
+        setTimeout(() => Refs.avatar.style.transform = 'scale(1) translateY(0)', 400);
     },
 
-    triggerState(title, body, win) {
+    setState(title, body, isWin) {
         this.paused = true;
         AudioEngine.pauseTheme();
-        Refs.ovTitle.innerText = title;
-        Refs.ovBody.innerText = body;
-        Refs.ovWin.style.display = win ? 'block' : 'none';
-        Refs.ovBtn.innerText = win ? "PLAY AGAIN" : (title === "STACKED OUT!" ? "RESTART" : "CONTINUE");
-        Refs.ov.style.display = 'flex';
+        Refs.title.innerText = title;
+        Refs.body.innerText = body;
+        Refs.winImg.style.display = isWin ? 'block' : 'none';
+        Refs.btn.innerText = isWin ? "PLAY AGAIN" : (title === "STACKED OUT!" ? "RESTART" : "CONTINUE");
+        Refs.overlay.style.display = 'flex';
     },
 
-    mainLoop(timestamp = 0) {
+    /**
+     * MASTER ENGINE TICK (60FPS Target)
+     */
+    mainTick(t = 0) {
         if (this.paused) return;
-        const dt = timestamp - this.lastFrame;
-        this.lastFrame = timestamp;
+        const dt = t - this.lastTick;
+        this.lastTick = t;
         
-        this.dropTimer += dt;
-        if (this.dropTimer > this.dropInterval) {
-            this.gravityTick();
-            this.dropTimer = 0;
+        this.dropCounter += dt;
+        if (this.dropCounter > this.interval) {
+            this.executeGravityDrop();
+            this.dropCounter = 0;
         }
         
-        this.renderAll();
-        requestAnimationFrame(this.mainLoop.bind(this));
+        this.drawWorld();
+        requestAnimationFrame(this.mainTick.bind(this));
     },
 
-    gravityTick() {
+    executeGravityDrop() {
         this.player.pos.y++;
         if (this.collide()) {
             this.player.pos.y--;
             this.merge();
             this.sweepRows();
-            this.respawnPiece();
+            this.spawn();
             AudioEngine.tone(200, 'sine', 0.15);
         }
-        EffectsEngine.pushStreak(this.player.matrix, this.player.pos);
+        // Buffer Vibrant Streak History
+        FXSystem.pushStreakFrame(this.player.matrix, this.player.pos);
     },
 
-    renderAll() {
-        // 1. Shake Pipeline
+    drawWorld() {
+        // 1. Haptic Shake Offset
         let sx = 0, sy = 0;
-        if (this.hapticShake > 0) {
-            sx = (Math.random() - 0.5) * this.hapticShake * 0.25;
-            sy = (Math.random() - 0.5) * this.hapticShake * 0.25;
-            this.hapticShake *= 0.85;
+        if (this.shakeStr > 0) {
+            sx = (Math.random() - 0.5) * this.shakeStr * 0.25;
+            sy = (Math.random() - 0.5) * this.shakeStr * 0.25;
+            this.shakeStr *= 0.85;
         }
 
         Refs.ctx.save();
         Refs.ctx.translate(sx, sy);
         
-        // 2. World Fill
-        Refs.ctx.fillStyle = CONFIG.Worlds[this.currentLvlIdx].bg;
+        // 2. Clear Scene & Draw Theme Backdrop
+        Refs.ctx.fillStyle = CONFIG.Worlds[this.lvlIndex].bg;
         Refs.ctx.fillRect(0, 0, Refs.canvas.width, Refs.canvas.height);
         
-        // 3. Grid Visualization
+        // 3. Grid Lines
         Refs.ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
         Refs.ctx.lineWidth = 0.04;
         for(let x=0; x<=CONFIG.Engine.COLS; x++) { 
@@ -601,7 +611,7 @@ const MasterEngine = {
             Refs.ctx.beginPath(); Refs.ctx.moveTo(0,y); Refs.ctx.lineTo(CONFIG.Engine.COLS,y); Refs.ctx.stroke(); 
         }
 
-        // 4. Static Arena Render
+        // 4. Render Landed Content
         this.drawMatrixToSurface(Refs.ctx, this.arena, {x:0, y:0});
         
         if (this.player.matrix) {
@@ -617,9 +627,9 @@ const MasterEngine = {
             this.drawMatrixToSurface(Refs.ctx, this.player.matrix, this.player.pos);
         }
 
-        // 7. FX Update
-        EffectsEngine.update();
-        EffectsEngine.render(Refs.ctx);
+        // 7. Visual FX Cycle
+        FXSystem.update();
+        FXSystem.render(Refs.ctx);
         
         Refs.ctx.restore();
 
@@ -637,7 +647,7 @@ const MasterEngine = {
         c.globalAlpha = isGhost ? 0.35 : 1.0;
         const cx = xPos + 0.5; const cy = yPos + 0.5;
         
-        // HELLO KITTY EAR LOGIC
+        // BRANDING: Hello Kitty Ear Logic (Color 1 Pink, Color 2 Yellow)
         if (!isGhost && (val === 1 || val === 2)) {
             c.fillStyle = CONFIG.Palette[val];
             c.beginPath(); c.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
@@ -659,13 +669,13 @@ const MasterEngine = {
     }
 };
 
-// --- VII. TACTILE INPUT (MODULE G: INPUT) ---
-let aX = 0, aY = 0, isSlide = false;
+// --- VI. GESTURE INTERFACE (MODULE G) ---
+let aX = 0, aY = 0, moved = false;
 
 Refs.canvas.addEventListener('touchstart', e => {
     if (MasterEngine.paused) return;
     aX = e.touches[0].clientX; aY = e.touches[0].clientY;
-    isSlide = false;
+    moved = false;
 }, {passive: false});
 
 Refs.canvas.addEventListener('touchmove', e => {
@@ -673,9 +683,9 @@ Refs.canvas.addEventListener('touchmove', e => {
     const cX = e.touches[0].clientX; const cY = e.touches[0].clientY;
     const dx = cX - aX; const dy = cY - aY;
     
-    if (Math.abs(dx) > 12 || Math.abs(dy) > 12) isSlide = true;
+    if (Math.abs(dx) > 12 || Math.abs(dy) > 12) moved = true;
 
-    // Move Step
+    // Movement Tick
     if (Math.abs(dx) > 38) {
         const d = dx > 0 ? 1 : -1;
         MasterEngine.player.pos.x += d;
@@ -687,28 +697,28 @@ Refs.canvas.addEventListener('touchmove', e => {
         aX = cX;
     }
     // Vertical Drop
-    if (dy > 65) MasterEngine.dropInterval = 45;
+    if (dy > 65) MasterEngine.interval = 45;
 }, {passive: false});
 
 Refs.canvas.addEventListener('touchend', () => {
-    if (!MasterEngine.paused && !isSlide) {
+    if (!MasterEngine.paused && !moved) {
         executePieceRotate();
     }
     if (!MasterEngine.paused) {
-        MasterEngine.dropInterval = CONFIG.Worlds[MasterEngine.currentLvlIdx].speed;
+        MasterEngine.interval = CONFIG.Worlds[MasterEngine.lvlIndex].speed;
     }
 });
 
-function handlePauseRequest() {
+function handlePauseTrigger() {
     if (MasterEngine.paused) return;
-    MasterEngine.triggerState("PAUSED", "Take a breath. You are doing great.", false);
+    MasterEngine.setState("PAUSED", "Take a breath. You are doing great.", false);
 }
 
 function requestPieceHold() {
-    if (!MasterEngine.canHold || MasterEngine.paused) return;
+    if (!MasterEngine.holdReady || MasterEngine.paused) return;
     if (!MasterEngine.held) {
         MasterEngine.held = MasterEngine.player.matrix;
-        MasterEngine.respawnPiece();
+        MasterEngine.spawn();
     } else {
         const t = MasterEngine.player.matrix;
         MasterEngine.player.matrix = MasterEngine.held;
@@ -716,19 +726,16 @@ function requestPieceHold() {
         MasterEngine.player.pos.y = 0;
         MasterEngine.player.pos.x = (CONFIG.Engine.COLS / 2 | 0) - (MasterEngine.player.matrix[0].length / 2 | 0);
     }
-    MasterEngine.canHold = false;
+    MasterEngine.holdReady = false;
     AudioEngine.tone(300, 'sine', 0.12);
 }
 
 function executePieceRotate() {
     const oldM = MasterEngine.player.matrix;
     const oldX = MasterEngine.player.pos.x;
-    
-    // Transpose/Reverse Matrix
     const rotated = MasterEngine.player.matrix[0].map((_, i) => MasterEngine.player.matrix.map(c => c[i]).reverse());
     MasterEngine.player.matrix = rotated;
     
-    // Wall Kick logic
     let off = 1;
     while (MasterEngine.collide()) {
         MasterEngine.player.pos.x += off;
@@ -743,7 +750,7 @@ function executePieceRotate() {
 }
 function requestPieceRotate() { executePieceRotate(); }
 
-// --- VIII. STATE TRANSITIONS ---
+// --- VII. APP STATE HANDLERS ---
 function requestAdventureStart() {
     AudioEngine.init();
     document.getElementById('state-menu').style.display = 'none';
@@ -752,19 +759,19 @@ function requestAdventureStart() {
 
 function executeOverlayClose() {
     AudioEngine.init();
-    if (Refs.ovBtn.innerText === "CONTINUE") {
-        Refs.ov.style.display = 'none';
+    if (Refs.btn.innerText === "CONTINUE") {
+        Refs.overlay.style.display = 'none';
         MasterEngine.paused = false;
         AudioEngine.playTheme();
-        requestAnimationFrame(MasterEngine.mainLoop.bind(MasterEngine));
+        requestAnimationFrame(MasterEngine.mainTick.bind(MasterEngine));
     } else {
         MasterEngine.reset();
     }
 }
 
-// Initial Render
-MasterEngine.renderAll();
-console.log("ENGINE V7.0 DEFINITIVE SOURCE READY.");
+// Initial Call
+MasterEngine.drawWorld();
+console.log("ENGINE V8.0 DEFINITIVE MASTER READY.");
 </script>
 </body>
 </html>

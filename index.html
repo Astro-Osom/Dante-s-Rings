@@ -1,72 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dante's Rings</title>
+    <meta charset="UTF-8">
+    <title>Dante's Rings: The Dream World Journey</title>
+    
     <link rel="apple-touch-icon" href="Dante_App_Logo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <style>
-        :root { --roblox-blue: #00A2FF; --roblox-green: #00E676; --accent: #FF1493; }
-        body { 
-            background: url('Roblox_Bg.jpg') no-repeat center center fixed; background-size: cover;
-            color: white; margin: 0; overflow: hidden; font-family: 'Comic Sans MS', sans-serif; 
-            touch-action: none; display: flex; flex-direction: column; align-items: center; height: 100vh;
+        :root { 
+            --roblox-blue: #00A2FF; 
+            --roblox-green: #00E676; 
+            --accent-pink: #FF1493; 
+            --ui-bg: rgba(0, 0, 0, 0.6);
         }
-        #ui-header { height: 10vh; width: 100%; text-align: center; padding-top: 5px; z-index: 10; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
-        #main-layout { display: flex; width: 98vw; height: 78vh; justify-content: center; align-items: center; gap: 8px; position: relative; z-index: 5; }
-        .sidebar { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 60px; }
-        .box { background: rgba(0,0,0,0.6); border: 3px solid #FFF; border-radius: 12px; height: 60px; display: flex; align-items: center; justify-content: center; position: relative; }
-        #dante-avatar { position: absolute; top: -55px; left: 0; width: 55px; height: 55px; transition: 0.2s; }
-        #dante-avatar img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.3)); }
-        #game-container { position: relative; height: 100%; aspect-ratio: 10 / 20; border: 6px solid #FFF; border-radius: 20px; background: rgba(0,0,0,0.5); overflow: hidden; }
-        canvas#tetris { width: 100%; height: 100%; display: block; }
-        #progress-container { width: 70%; height: 10px; background: rgba(0,0,0,0.3); border: 2px solid #FFF; border-radius: 10px; margin: 5px auto; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: var(--roblox-green); box-shadow: 0 0 10px var(--roblox-green); transition: width 0.3s; }
-        .bottom-bar { display: flex; gap: 15px; padding: 10px; height: 10vh; z-index: 10; }
-        .action-btn { width: 80px; height: 60px; border-radius: 15px; border: 3px solid #FFF; background: var(--roblox-blue); font-size: 24px; color: white; box-shadow: 0 5px 0px #0077be; }
-        #start-overlay, #overlay { position: absolute; inset: 0; background: rgba(0, 162, 255, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; }
-        .overlay-btn { padding: 15px 35px; background: var(--roblox-green); color: white; border: 5px solid white; border-radius: 40px; font-size: 24px; font-weight: bold; box-shadow: 0 6px 0px #009624; margin-top: 15px; }
-        #win-image { width: 160px; margin-bottom: 10px; display: none; border-radius: 15px; }
-        #mute-btn { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border: 2px solid #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1100; }
+
+        /* 1. LAYOUT RESET & BACKGROUND */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #000 url('Roblox_Bg.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            color: white; 
+            font-family: 'Comic Sans MS', sans-serif; 
+            touch-action: none; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            height: 100vh;
+            width: 100vw;
+            transition: background 1s ease;
+        }
+
+        /* 2. UI HEADER - 12% Screen Height */
+        #ui-header { 
+            height: 12vh; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(10px); 
+            z-index: 10;
+        }
+
+        /* 3. MAIN GAMEPLAY AREA - 73% Screen Height */
+        #main-layout { 
+            display: flex; 
+            width: 98vw; 
+            height: 73vh; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            position: relative; 
+            z-index: 5; 
+        }
+
+        /* 4. SIDEBARS (HOLD/NEXT) */
+        .sidebar { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            gap: 10px; 
+            width: 70px; 
+            text-align: center; 
+        }
+        .box { 
+            background: var(--ui-bg); 
+            border: 3px solid #FFF; 
+            border-radius: 15px; 
+            height: 75px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.3); 
+        }
+
+        /* 5. DANTE CHARACTER PLACEMENT */
+        #dante-avatar { 
+            position: absolute; 
+            top: -65px; 
+            left: 5px; 
+            width: 60px; 
+            height: 60px; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        #dante-avatar img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.5)); 
+        }
+
+        /* 6. THE GRID (MAXIMIZED) */
+        #game-container { 
+            position: relative; 
+            height: 100%; 
+            aspect-ratio: 10 / 20; 
+            border: 6px solid #FFF; 
+            border-radius: 25px; 
+            background: rgba(0,0,0,0.4); 
+            overflow: hidden; 
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
+        }
+        canvas#tetris { 
+            width: 100%; 
+            height: 100%; 
+            display: block; 
+        }
+
+        /* 7. PROGRESS BAR */
+        #progress-container { 
+            width: 70%; 
+            height: 14px; 
+            background: rgba(255,255,255,0.2); 
+            border: 2px solid #FFF; 
+            border-radius: 15px; 
+            margin: 5px auto; 
+            overflow: hidden; 
+        }
+        #progress-fill { 
+            width: 0%; 
+            height: 100%; 
+            background: var(--roblox-green); 
+            box-shadow: 0 0 15px var(--roblox-green); 
+            transition: width 0.3s; 
+        }
+
+        /* 8. CONTROLS BAR - 15% Screen Height */
+        .bottom-bar { 
+            display: flex; 
+            gap: 25px; 
+            padding: 10px; 
+            height: 15vh; 
+            width: 100%; 
+            justify-content: center; 
+            background: rgba(0,0,0,0.4); 
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .action-btn { 
+            width: 110px; 
+            height: 75px; 
+            border-radius: 20px; 
+            border: 4px solid #FFF; 
+            background: var(--roblox-blue); 
+            font-size: 32px; 
+            color: white; 
+            box-shadow: 0 6px 0px #0077be; 
+            cursor: pointer; 
+        }
+
+        /* 9. OVERLAYS (START, STORY, WIN, GAME OVER) */
+        #start-overlay, #overlay { 
+            position: absolute; 
+            inset: 0; 
+            background: var(--roblox-blue); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            text-align: center; 
+            padding: 30px; 
+            box-sizing: border-box; 
+        }
+        .overlay-btn { 
+            padding: 18px 40px; 
+            background: var(--roblox-green); 
+            color: white; 
+            border: 5px solid white; 
+            border-radius: 50px; 
+            font-size: 28px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 8px 0px #009624; 
+            margin-top: 20px; 
+        }
+        #win-image { 
+            width: 240px; 
+            margin-bottom: 20px; 
+            display: none; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); 
+        }
+        #mute-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            width: 45px; 
+            height: 45px; 
+            background: rgba(255,255,255,0.3); 
+            border: 2px solid #FFF; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1100; 
+            font-size: 24px; 
+        }
+
+        /* Roblox Clouds */
+        .cloud { 
+            position: absolute; 
+            background: rgba(255,255,255,0.8); 
+            border-radius: 8px; 
+            z-index: 1; 
+            pointer-events: none; 
+        }
+        @keyframes drift { from { transform: translateX(-200px); } to { transform: translateX(110vw); } }
     </style>
 </head>
 <body onpointerdown="unlockAudio()">
 
     <div id="mute-btn" onclick="toggleMute()">🔊</div>
 
+    <div class="cloud" style="width:140px; height:50px; top:10%; animation: drift 35s linear infinite;"></div>
+    <div class="cloud" style="width:180px; height:65px; top:45%; animation: drift 50s linear reverse infinite;"></div>
+
     <div id="start-overlay">
-        <img src="Dante_App_Logo.png" style="width:140px; margin-bottom:15px;">
-        <h1 style="font-size: 36px; margin: 0;">DANTE'S RINGS</h1>
-        <p>Follow your finger to move!</p>
-        <button class="overlay-btn" onclick="startGame()">START GAME</button>
+        <img src="Dante_App_Logo.png" style="width:180px; margin-bottom:20px; filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.2));">
+        <h1 style="font-size: 48px; margin: 0; text-shadow: 4px 4px 0px rgba(0,0,0,0.2);">DANTE'S RINGS</h1>
+        <p style="font-size: 18px;">A Future Vibrant Self Adventure</p>
+        <button class="overlay-btn" onclick="startGame()">START ADVENTURE</button>
     </div>
 
     <div id="ui-header">
-        <b id="level-title">Underwater World</b><br>
-        <small>Score: <span id="score">0</span> | Lines: <span id="lines-count">0</span></small>
+        <b id="level-title" style="font-size: 24px;">Underwater World</b>
+        <div style="font-size: 18px; margin: 2px 0;">Score: <span id="score">0</span> | Lines: <span id="lines-count">0</span></div>
         <div id="progress-container"><div id="progress-fill"></div></div>
     </div>
     
     <div id="main-layout">
         <div class="sidebar">
-            <small style="font-weight:bold;">HOLD</small>
+            <b style="font-size:12px;">HOLD</b>
             <div class="box">
-                <div id="dante-avatar"><img src="Dante_App_Logo.png"></div>
+                <div id="dante-avatar"><img src="Dante_App_Logo.png" id="dante-img"></div>
                 <canvas id="hold-canvas" width="50" height="50"></canvas>
             </div>
         </div>
+
         <div id="game-container">
             <canvas id="tetris" width="200" height="400"></canvas>
-            <div id="overlay" style="display:none; background: rgba(0,0,0,0.9);">
+            
+            <div id="overlay" style="display:none; background: rgba(0,0,0,0.95);">
                 <img id="win-image" src="Youwin.png">
-                <h2 id="overlay-title">PAUSED</h2>
-                <p id="overlay-text" style="font-size:14px; max-width:220px;"></p>
-                <button class="overlay-btn" id="overlay-primary-btn" onclick="resumeGame()">CONTINUE</button>
+                <h2 id="overlay-title" style="font-size: 32px; margin: 10px 0;">PAUSED</h2>
+                <p id="overlay-text" style="font-size:18px; max-width:280px; line-height: 1.4; margin: 10px 0;"></p>
+                <button class="overlay-btn" id="overlay-primary-btn" onclick="handleOverlayAction()">CONTINUE</button>
             </div>
         </div>
+
         <div class="sidebar">
-            <small style="font-weight:bold;">NEXT</small>
+            <b style="font-size:12px;">NEXT</b>
             <div class="box"><canvas id="next-canvas" width="50" height="50"></canvas></div>
         </div>
     </div>
@@ -77,177 +267,141 @@
     </div>
 
 <script>
-// --- DOM REFERENCES ---
+/**
+ * DANTE'S RINGS - ULTIMATE MASTER SCRIPT
+ * --------------------------------------
+ * Line-by-line verified for iPad OS / Roblox Vibe / Future Vibrant Self
+ */
+
+// --- 1. DOM REFERENCES ---
+const canvas = document.getElementById('tetris');
+const ctx = canvas.getContext('2d');
+const hctx = document.getElementById('hold-canvas').getContext('2d');
+const nctx = document.getElementById('next-canvas').getContext('2d');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayText = document.getElementById('overlay-text');
 const overlayPrimaryBtn = document.getElementById('overlay-primary-btn');
+const winImage = document.getElementById('win-image');
 const progressFill = document.getElementById('progress-fill');
-const danteAvatar = document.getElementById('dante-avatar');
-const levelTitle = document.getElementById('level-title');
+const danteBox = document.getElementById('dante-avatar');
 
-// --- AUDIO ---
+// --- 2. AUDIO ENGINE (M4A FIXED) ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const bgMusic = new Audio('Dantesgamemusic.m4a');
-bgMusic.loop = true; bgMusic.volume = 0.4;
-let isMuted = false, audioUnlocked = false;
+bgMusic.loop = true; 
+bgMusic.volume = 0.45;
+let audioUnlocked = false, isMuted = false;
 
 function unlockAudio() {
-    if (!audioUnlocked && audioCtx.state === 'suspended') audioCtx.resume();
-    audioUnlocked = true;
+    if (!audioUnlocked) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        bgMusic.play().catch(err => console.log("Audio waiting for first interaction"));
+        audioUnlocked = true;
+    }
 }
-function startGame() {
-    unlockAudio(); bgMusic.play().catch(e => console.log("Audio waiting"));
-    document.getElementById('start-overlay').style.display = 'none';
-    isPaused = false; update();
+
+function toggleMute() {
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
+    document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊';
 }
-function toggleMute() { isMuted = !isMuted; bgMusic.muted = isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; }
+
 function playTone(freq, type, duration) {
     if (isMuted || !audioUnlocked) return;
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
 }
 
-// --- DATA ---
-const ringStory = ["Underwater: Dante learns to breathe.", "Pandora: Curiosity opens new colors.", "Minecraft: Dante rebuilds patterns.", "Lego World: Play with structure.", "Rainforest: Trust growth.", "Outer Space: Find stillness.", "Jungle: Follow instinct.", "School: Every mis-drop is a lesson.", "Sun Surface: Hold your shape.", "Dream World: Wake up inside your imagination."];
-const themes = [
-    { name: "Underwater World", bg: "rgba(0, 168, 255, 0.3)", target: 30, speed: 1000 },
-    { name: "Pandora", bg: "rgba(106, 13, 173, 0.3)", target: 60, speed: 900 },
-    { name: "Minecraft", bg: "rgba(124, 252, 0, 0.3)", target: 90, speed: 800 },
-    { name: "Legoworld", bg: "rgba(255, 0, 0, 0.3)", target: 120, speed: 750 },
-    { name: "Rainforest", bg: "rgba(0, 100, 0, 0.3)", target: 150, speed: 700 },
-    { name: "Outer Space", bg: "rgba(0, 0, 34, 0.5)", target: 180, speed: 650 },
-    { name: "Jungle", bg: "rgba(34, 139, 34, 0.3)", target: 210, speed: 600 },
-    { name: "School", bg: "rgba(47, 79, 79, 0.3)", target: 240, speed: 550 },
-    { name: "Sun Surface", bg: "rgba(255, 69, 0, 0.3)", target: 270, speed: 500 },
-    { name: "Dream World", bg: "rgba(255, 182, 193, 0.4)", target: 350, speed: 450 }
+// --- 3. DATA & THEMES ---
+const ringStory = [
+    "Underwater: Dante learns to breathe beneath the surface of his feelings.",
+    "Pandora: Curiosity opens new colors in Dante's sky.",
+    "Minecraft: Dante discovers he can rebuild any pattern he breaks.",
+    "Lego World: Dante plays with structure instead of fearing it.",
+    "Rainforest: Dante trusts growth he cannot yet see.",
+    "Outer Space: Dante finds stillness in the vast unknown.",
+    "Jungle: Dante follows instinct, moving piece by piece.",
+    "School: Dante realizes every mis-drop is a lesson.",
+    "Sun Surface: Dante holds his shape even in the heat.",
+    "Dream World: Dante wakes up inside his own imagination."
 ];
 
-// --- TOUCH DRAG SYSTEM ---
-let touchStartX = 0, touchStartY = 0, didMove = false;
+const themes = [
+    { name: "Underwater World", bg: "rgba(0, 168, 255, 0.4)", target: 30, speed: 1000 },
+    { name: "Pandora", bg: "rgba(106, 13, 173, 0.4)", target: 60, speed: 900 },
+    { name: "Minecraft", bg: "rgba(124, 252, 0, 0.4)", target: 90, speed: 820 },
+    { name: "Legoworld", bg: "rgba(255, 0, 0, 0.4)", target: 120, speed: 750 },
+    { name: "Rainforest", bg: "rgba(0, 100, 0, 0.4)", target: 150, speed: 680 },
+    { name: "Outer Space", bg: "rgba(0, 0, 34, 0.6)", target: 180, speed: 600 },
+    { name: "Jungle", bg: "rgba(34, 139, 34, 0.4)", target: 210, speed: 520 },
+    { name: "School", bg: "rgba(47, 79, 79, 0.4)", target: 240, speed: 450 },
+    { name: "Sun Surface", bg: "rgba(255, 69, 0, 0.4)", target: 270, speed: 380 },
+    { name: "Dream World", bg: "rgba(255, 182, 193, 0.5)", target: 350, speed: 320 }
+];
 
-canvas.addEventListener('touchstart', e => {
-    if (isPaused) return;
-    touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
-    didMove = false;
-}, {passive: false});
-
-canvas.addEventListener('touchmove', e => {
-    if (isPaused) return;
-    e.preventDefault();
-    const touchX = e.touches[0].clientX, touchY = e.touches[0].clientY;
-    const deltaX = touchX - touchStartX, deltaY = touchY - touchStartY;
-    
-    // Distinguish Move from Tap
-    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) didMove = true;
-
-    // Horizontal Move Step
-    if (Math.abs(deltaX) > 30) {
-        playerMove(deltaX > 0 ? 1 : -1); touchStartX = touchX;
-    }
-
-    // Sticky Soft Drop
-    if (deltaY > 50) startDrop();
-}, {passive: false});
-
-canvas.addEventListener('touchend', () => {
-    if (!isPaused && !didMove) playerRotate(1); // Real Tap
-    stopDrop();
-});
-
-// --- ENGINE ---
-const canvas_ctx = canvas.getContext('2d');
-const h_ctx = hctx, n_ctx = nctx;
+// --- 4. GAME MECHANICS ---
 const GRID_W = 10, GRID_H = 20, SCALE = 20;
-canvas_ctx.scale(SCALE, SCALE); h_ctx.scale(12, 12); n_ctx.scale(12, 12);
+ctx.scale(SCALE, SCALE); 
+hctx.scale(12, 12); 
+nctx.scale(12, 12);
+
 const colors = [null, '#FF1493', '#FFD700', '#A020F0', '#00E5FF', '#FF4500', '#39FF14', '#FF0000'];
+const arena = Array.from({length: GRID_H}, () => Array(GRID_W).fill(0));
+const player = { pos: {x: 0, y: 0}, matrix: null, score: 0 };
 
-function draw() {
-    canvas_ctx.fillStyle = themes[currentLevelIndex].bg; canvas_ctx.fillRect(0, 0, canvas.width, canvas.height);
-    canvas_ctx.strokeStyle = "rgba(255, 255, 255, 0.15)"; canvas_ctx.lineWidth = 0.03;
-    for(let x=0; x<=GRID_W; x++) { canvas_ctx.beginPath(); canvas_ctx.moveTo(x,0); canvas_ctx.lineTo(x,GRID_H); canvas_ctx.stroke(); }
-    for(let y=0; y<=GRID_H; y++) { canvas_ctx.beginPath(); canvas_ctx.moveTo(0,y); canvas_ctx.lineTo(GRID_W,y); canvas_ctx.stroke(); }
-    drawMatrix(canvas_ctx, arena, {x: 0, y: 0});
-    const ghost = {x: player.pos.x, y: player.pos.y};
-    while (!collide(arena, {pos: ghost, matrix: player.matrix})) ghost.y++; ghost.y--;
-    drawMatrix(canvas_ctx, player.matrix, ghost, true);
-    drawMatrix(canvas_ctx, player.matrix, player.pos);
-    n_ctx.clearRect(0,0,5,5); drawMatrix(n_ctx, nextPiece, {x:0, y:0});
-    h_ctx.clearRect(0,0,5,5); if (heldPiece) drawMatrix(h_ctx, heldPiece, {x:0, y:0});
+let nextPiece = null, heldPiece = null, canHold = true, totalLines = 0, currentLevelIndex = 0;
+let isPaused = true, dropCounter = 0, lastTime = 0, dropInterval = 1000;
+
+function createPiece(type) {
+    if (type === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
+    if (type === 'L') return [[0,2,0],[0,2,0],[0,2,2]];
+    if (type === 'J') return [[0,3,0],[0,3,0],[3,3,0]];
+    if (type === 'O') return [[4,4],[4,4]];
+    if (type === 'Z') return [[5,5,0],[0,5,5],[0,0,0]];
+    if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+    if (type === 'T') return [[0,7,0],[7,7,7],[0,0,0]];
 }
 
-function drawRing(ctx, x, y, value, isGhost = false) {
-    ctx.globalAlpha = isGhost ? 0.3 : 1;
-    const cx = x + 0.5, cy = y + 0.5;
-    if (!isGhost && (value === 1 || value === 2)) {
-        ctx.fillStyle = colors[value];
-        ctx.beginPath(); ctx.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(cx + 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.beginPath(); ctx.arc(cx, cy, 0.42, 0, Math.PI * 2);
-    ctx.fillStyle = colors[value]; ctx.fill();
-    ctx.strokeStyle = 'white'; ctx.lineWidth = 0.08; ctx.stroke();
-    ctx.globalAlpha = 1;
-}
-
-function drawMatrix(ctx, matrix, offset, isGhost = false) {
-    matrix.forEach((row, y) => row.forEach((v, x) => { if (v !== 0) drawRing(ctx, x + offset.x, y + offset.y, v, isGhost); }));
-}
-
-function arenaSweep() {
-    let rowCount = 0;
-    for (let y = arena.length - 1; y >= 0; --y) {
-        if (arena[y].every(v => v !== 0)) {
-            arena.splice(y, 1); arena.unshift(new Array(GRID_W).fill(0));
-            rowCount++; y++;
-        }
-    }
-    if (rowCount > 0) {
-        totalLines += rowCount; player.score += rowCount * 10;
-        playTone(523, 'sine', 0.2); updateUI();
-        danteAvatar.style.transform = 'scale(1.4) translateY(-15px)';
-        setTimeout(() => danteAvatar.style.transform = 'scale(1) translateY(0)', 300);
-    }
-}
-
-function updateUI() {
-    document.getElementById('score').innerText = player.score;
-    document.getElementById('lines-count').innerText = totalLines;
-    const th = themes[currentLevelIndex];
-    const prev = currentLevelIndex > 0 ? themes[currentLevelIndex - 1].target : 0;
-    progressFill.style.width = Math.max(0, Math.min(100, ((totalLines - prev) / (th.target - prev) * 100))) + '%';
-    
-    if (currentLevelIndex === themes.length - 1 && totalLines >= th.target) { showOverlay("YOU REACHED DREAM WORLD!", "Dante won!", true); return; }
-    if (totalLines >= th.target && currentLevelIndex < themes.length - 1) {
-        currentLevelIndex++; dropInterval = themes[currentLevelIndex].speed;
-        levelTitle.innerText = themes[currentLevelIndex].name;
-        playTone(880, 'square', 0.5); showOverlay(themes[currentLevelIndex].name, ringStory[currentLevelIndex], false);
-    }
-}
-
-function showOverlay(title, text, isWin) {
-    isPaused = true; bgMusic.pause();
-    overlayTitle.innerText = title; overlayText.innerText = text;
-    document.getElementById('win-image').style.display = isWin ? 'block' : 'none';
-    overlayPrimaryBtn.innerText = isWin ? "PLAY AGAIN" : (title === "STACKED OUT!" ? "START AGAIN" : "CONTINUE");
-    overlay.style.display = 'flex';
-}
-
-function resumeGame() {
-    if (overlayPrimaryBtn.innerText !== "CONTINUE") softReset();
-    else { overlay.style.display = 'none'; isPaused = false; if(!isMuted) bgMusic.play(); update(); }
+function startGame() {
+    unlockAudio();
+    document.getElementById('start-overlay').style.display = 'none';
+    softReset();
 }
 
 function softReset() {
-    arena.forEach(row => row.fill(0)); totalLines = 0; player.score = 0; currentLevelIndex = 0;
-    heldPiece = null; nextPiece = null; dropInterval = themes[0].speed;
-    levelTitle.innerText = themes[0].name; updateUI();
-    overlay.style.display = 'none'; isPaused = false;
-    playerReset(); if(!isMuted) bgMusic.play(); update();
+    arena.forEach(row => row.fill(0));
+    totalLines = 0; player.score = 0; currentLevelIndex = 0;
+    heldPiece = null; nextPiece = null;
+    dropInterval = themes[0].speed;
+    document.getElementById('level-title').innerText = themes[0].name;
+    updateUI();
+    overlay.style.display = 'none';
+    isPaused = false;
+    playerReset();
+    if(!isMuted) bgMusic.play();
+    requestAnimationFrame(update);
+}
+
+function playerReset() {
+    const pieces = 'ILJOTSZ';
+    player.matrix = nextPiece || createPiece(pieces[Math.random() * pieces.length | 0]);
+    nextPiece = createPiece(pieces[Math.random() * pieces.length | 0]);
+    player.pos.y = 0;
+    player.pos.x = (GRID_W / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    canHold = true;
+    if (collide(arena, player)) {
+        playTone(150, 'sawtooth', 0.5);
+        showOverlay("STACKED OUT!", "Notice the pattern you're building. Breathe, and try again.", false);
+    }
 }
 
 function collide(arena, p) {
@@ -260,46 +414,123 @@ function collide(arena, p) {
     return false;
 }
 
-function playerReset() {
-    const pcs = 'ILJOTSZ';
-    player.matrix = nextPiece || createPiece(pcs[Math.random() * pcs.length | 0]);
-    nextPiece = createPiece(pcs[Math.random() * pcs.length | 0]);
-    player.pos.y = 0; player.pos.x = (GRID_W / 2 | 0) - (player.matrix[0].length / 2 | 0);
-    canHold = true;
-    if (collide(arena, player)) { playTone(150, 'sawtooth', 0.5); showOverlay("STACKED OUT!", "Try again!", false); }
+function merge(arena, p) {
+    p.matrix.forEach((row, y) => row.forEach((v, x) => { 
+        if (v !== 0) arena[y + p.pos.y][x + p.pos.x] = v; 
+    }));
 }
 
-function createPiece(t) {
-    if (t === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
-    if (t === 'L') return [[0,2,0],[0,2,0],[0,2,2]];
-    if (t === 'J') return [[0,3,0],[0,3,0],[3,3,0]];
-    if (t === 'O') return [[4,4],[4,4]];
-    if (t === 'Z') return [[5,5,0],[0,5,5],[0,0,0]];
-    if (t === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
-    if (t === 'T') return [[0,7,0],[7,7,7],[0,0,0]];
-}
-
-function playerDrop() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-        player.pos.y--; merge(arena, player); arenaSweep(); playerReset();
-        playTone(200, 'sine', 0.1);
+function arenaSweep() {
+    let rowCount = 0;
+    for (let y = arena.length - 1; y >= 0; --y) {
+        if (arena[y].every(v => v !== 0)) {
+            arena.splice(y, 1);
+            arena.unshift(new Array(GRID_W).fill(0));
+            rowCount++; y++;
+        }
     }
-    dropCounter = 0;
+    if (rowCount > 0) {
+        totalLines += rowCount;
+        player.score += rowCount * 10;
+        playTone(523, 'sine', 0.2); 
+        updateUI();
+        danteBox.style.transform = 'scale(1.4) translateY(-15px)';
+        setTimeout(() => danteBox.style.transform = 'scale(1) translateY(0)', 300);
+    }
 }
 
-function merge(arena, p) { p.matrix.forEach((row, y) => row.forEach((v, x) => { if (v !== 0) arena[y + p.pos.y][x + p.pos.x] = v; })); }
-function playerMove(dir) { player.pos.x += dir; if (collide(arena, player)) player.pos.x -= dir; else playTone(400, 'sine', 0.05); }
+function updateUI() {
+    document.getElementById('score').innerText = player.score;
+    document.getElementById('lines-count').innerText = totalLines;
+    const th = themes[currentLevelIndex];
+    const prev = currentLevelIndex > 0 ? themes[currentLevelIndex - 1].target : 0;
+    const pct = Math.max(0, Math.min(100, ((totalLines - prev) / (th.target - prev) * 100)));
+    progressFill.style.width = pct + '%';
 
+    // WIN CONDITION
+    if (currentLevelIndex === themes.length - 1 && totalLines >= th.target) {
+        showOverlay("YOU REACHED DREAM WORLD!", "Dante climbed every ring. The patterns you play now are the Self you're rehearsing.", true);
+        return;
+    }
+    // LEVEL UP
+    if (totalLines >= th.target && currentLevelIndex < themes.length - 1) {
+        currentLevelIndex++;
+        dropInterval = themes[currentLevelIndex].speed;
+        document.getElementById('level-title').innerText = themes[currentLevelIndex].name;
+        playTone(880, 'square', 0.5);
+        showOverlay(themes[currentLevelIndex].name, ringStory[currentLevelIndex], false);
+    }
+}
+
+function showOverlay(title, text, isWin) {
+    isPaused = true; bgMusic.pause();
+    overlayTitle.innerText = title;
+    overlayText.innerText = text;
+    winImage.style.display = isWin ? 'block' : 'none';
+    if (isWin) overlayPrimaryBtn.innerText = "PLAY AGAIN";
+    else if (title === "STACKED OUT!") overlayPrimaryBtn.innerText = "START AGAIN";
+    else overlayPrimaryBtn.innerText = "CONTINUE";
+    overlay.style.display = 'flex';
+}
+
+function handleOverlayAction() {
+    unlockAudio();
+    if (overlayPrimaryBtn.innerText === "CONTINUE") {
+        overlay.style.display = 'none';
+        isPaused = false;
+        if(!isMuted) bgMusic.play();
+        update();
+    } else {
+        softReset();
+    }
+}
+
+// --- 5. TOUCH & GESTURE ENGINE ---
+let touchStartX = 0, touchStartY = 0, didMove = false;
+
+canvas.addEventListener('touchstart', e => {
+    if (isPaused) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    didMove = false;
+}, {passive: false});
+
+canvas.addEventListener('touchmove', e => {
+    if (isPaused) return;
+    e.preventDefault();
+    const tx = e.touches[0].clientX, ty = e.touches[0].clientY;
+    const dx = tx - touchStartX, dy = ty - touchStartY;
+    
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) didMove = true;
+
+    // Drag Horizontal Move
+    if (Math.abs(dx) > 30) {
+        const dir = dx > 0 ? 1 : -1;
+        player.pos.x += dir;
+        if (collide(arena, player)) player.pos.x -= dir;
+        else playTone(400, 'sine', 0.05);
+        touchStartX = tx;
+    }
+    // Sticky Soft Drop
+    if (dy > 50) dropInterval = 50;
+}, {passive: false});
+
+canvas.addEventListener('touchend', () => {
+    if (!isPaused && !didMove) playerRotate(1); // Tap to Rotate
+    if (!isPaused) dropInterval = themes[currentLevelIndex].speed;
+});
+
+// --- 6. CORE COMMANDS ---
+function playerMove(dir) { player.pos.x += dir; if(collide(arena, player)) player.pos.x -= dir; else playTone(400, 'sine', 0.05); }
 function playerRotate(d) {
     const p = player.pos.x; let o = 1; rotate(player.matrix, d);
-    while (collide(arena, player)) { player.pos.x += o; o = -(o + (o > 0 ? 1 : -1)); if (o > 4) { rotate(player.matrix, -d); player.pos.x = p; return; } }
+    while (collide(arena, player)) {
+        player.pos.x += o; o = -(o + (o > 0 ? 1 : -1));
+        if (o > 4) { rotate(player.matrix, -d); player.pos.x = p; return; }
+    }
     playTone(600, 'sine', 0.05);
 }
-function rotate(m, d) {
-    for (let y = 0; y < m.length; ++y) { for (let x = 0; x < y; ++x) { [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; } }
-    if (d > 0) m.forEach(r => r.reverse()); else m.reverse();
-}
+function rotate(m, d) { for (let y = 0; y < m.length; ++y) { for (let x = 0; x < y; ++x) { [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; } } if (d > 0) m.forEach(r => r.reverse()); else m.reverse(); }
 function playerHold() {
     if (!canHold) return;
     if (!heldPiece) { heldPiece = player.matrix; playerReset(); }
@@ -307,29 +538,69 @@ function playerHold() {
     canHold = false; playTone(300, 'sine', 0.1);
 }
 
-document.addEventListener('keydown', e => {
-    if (isPaused) return;
-    if (e.keyCode === 37) playerMove(-1); else if (e.keyCode === 39) playerMove(1);
-    else if (e.keyCode === 40) startDrop(); else if (e.keyCode === 38 || e.keyCode === 32) playerRotate(1);
-    else if (e.keyCode === 72 || e.keyCode === 16) playerHold();
-});
-document.addEventListener('keyup', e => { if (e.keyCode === 40) stopDrop(); });
+// --- 7. RENDER & UPDATE ---
+function drawRing(c, x, y, v, ghost = false) {
+    c.globalAlpha = ghost ? 0.3 : 1;
+    const cx = x + 0.5, cy = y + 0.5;
+    // Hello Kitty logic: Pieces 1 (Pink) and 2 (Yellow) get ears if not ghost
+    if (!ghost && (v === 1 || v === 2)) {
+        c.fillStyle = colors[v];
+        c.beginPath(); c.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(cx + 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
+    }
+    c.beginPath(); c.arc(cx, cy, 0.42, 0, Math.PI * 2);
+    c.fillStyle = colors[v]; c.fill();
+    c.strokeStyle = 'white'; c.lineWidth = 0.08; c.stroke();
+    c.globalAlpha = 1;
+}
 
-let dropCounter = 0, dropInterval = 1000, lastTime = 0, isPaused = true;
-function startDrop() { dropInterval = 50; } function stopDrop() { dropInterval = themes[currentLevelIndex].speed; }
+function drawMatrix(c, m, o, g = false) { if(!m) return; m.forEach((r, y) => r.forEach((v, x) => { if (v !== 0) drawRing(c, x + o.x, y + o.y, v, g); })); }
 
-function update(t = 0) {
+function draw() {
+    ctx.fillStyle = themes[currentLevelIndex].bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Grid Lines (Baseplate style)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)"; ctx.lineWidth = 0.03;
+    for(let x=0; x<=GRID_W; x++) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,GRID_H); ctx.stroke(); }
+    for(let y=0; y<=GRID_H; y++) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(GRID_W,y); ctx.stroke(); }
+
+    if(player.matrix) {
+        drawMatrix(ctx, arena, {x: 0, y: 0});
+        const ghost = {x: player.pos.x, y: player.pos.y};
+        while (!collide(arena, {pos: ghost, matrix: player.matrix})) ghost.y++; ghost.y--;
+        drawMatrix(ctx, player.matrix, ghost, true);
+        drawMatrix(ctx, player.matrix, player.pos);
+    }
+    nctx.clearRect(0,0,5,5); drawMatrix(nctx, nextPiece, {x:0, y:0});
+    hctx.clearRect(0,0,5,5); if (heldPiece) drawMatrix(hctx, heldPiece, {x:0, y:0});
+}
+
+function update(time = 0) {
     if (isPaused) return;
-    const dt = t - lastTime; lastTime = t; dropCounter += dt;
-    if (dropCounter > dropInterval) playerDrop();
+    const dt = time - lastTime; lastTime = time; dropCounter += dt;
+    if (dropCounter > dropInterval) {
+        player.pos.y++;
+        if(collide(arena, player)) {
+            player.pos.y--; merge(arena, player); arenaSweep(); playerReset();
+            playTone(200, 'sine', 0.1);
+        }
+        dropCounter = 0;
+    }
     draw(); requestAnimationFrame(update);
 }
 
-const arena = Array.from({length: GRID_H}, () => Array(GRID_W).fill(0));
-const player = { pos: {x: 0, y: 0}, matrix: null };
-let nextPiece = null, heldPiece = null, canHold = true, totalLines = 0, currentLevelIndex = 0;
+// Keyboard (Backup)
+document.addEventListener('keydown', e => {
+    if (isPaused) return;
+    if (e.keyCode === 37) playerMove(-1); else if (e.keyCode === 39) playerMove(1);
+    else if (e.keyCode === 40) dropInterval = 50; else if (e.keyCode === 38 || e.keyCode === 32) playerRotate(1);
+    else if (e.keyCode === 72) playerHold();
+});
+document.addEventListener('keyup', e => { if (e.keyCode === 40) dropInterval = themes[currentLevelIndex].speed; });
 
-playerReset(); draw();
+// Init
+draw();
 </script>
 </body>
 </html>

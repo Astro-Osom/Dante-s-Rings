@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dante's Rings: The Dream World Journey</title>
+    <title>Dante's Rings: A Future Vibrant Self Adventure</title>
     
     <link rel="apple-touch-icon" href="Dante_App_Logo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,839 +10,944 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <style>
-        /* CSS VARIABLES FOR BRANDING */
-        :root { 
-            --roblox-blue: #00A2FF; 
-            --roblox-green: #00E676; 
-            --candy-pink: #FF1493; 
-            --candy-yellow: #FFD700;
-            --ui-bg-dark: rgba(0, 0, 0, 0.7);
-            --border-glow: #FFFFFF;
+        /* --- DESIGN TOKENS --- */
+        :root {
+            --roblox-blue: #00A2FF;
+            --roblox-green: #00E676;
+            --vibrant-pink: #FF1493;
+            --vibrant-yellow: #FFD700;
+            --ui-glass: rgba(0, 0, 0, 0.65);
+            --ui-border: rgba(255, 255, 255, 0.3);
+            --text-glow: 0 0 15px rgba(0, 162, 255, 0.8);
         }
 
-        /* 2. CORE LAYOUT & RESPONSIVE BACKGROUND */
-        body { 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background: #000 url('Roblox_Bg.jpg') no-repeat center center fixed; 
-            background-size: cover; 
-            color: white; 
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
-            touch-action: none; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        /* --- WORLD ARCHITECTURE --- */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000 url('Roblox_Bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: 'Avenir Next', 'Chalkboard SE', 'Comic Sans MS', sans-serif;
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             height: 100vh;
             width: 100vw;
-            transition: background 1.5s ease-in-out;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 2s ease-in-out;
         }
 
-        /* 3. DYNAMIC SKY ELEMENTS (ROBLOX STYLE) */
-        .cloud { 
-            position: absolute; 
-            background: rgba(255, 255, 255, 0.85); 
-            border-radius: 8px; 
-            z-index: 1; 
-            pointer-events: none; 
+        /* ROBLOX CLOUDS */
+        .cloud-drift {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            z-index: 1;
+            pointer-events: none;
+            filter: blur(1.5px);
         }
-        @keyframes drift { 
-            from { transform: translateX(-300px); } 
-            to { transform: translateX(120vw); } 
-        }
-
-        /* 4. THE HUD - TOP BAR (12% HEIGHT) */
-        #ui-header { 
-            height: 12vh; 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background: rgba(0, 0, 0, 0.55); 
-            backdrop-filter: blur(15px); 
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            z-index: 10;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        @keyframes driftAnim {
+            from { transform: translateX(-450px); }
+            to { transform: translateX(120vw); }
         }
 
-        /* 5. THE PLAYFIELD AREA (73% HEIGHT) */
-        #main-layout { 
-            display: flex; 
-            flex: 1; 
-            width: 100%; 
-            max-width: 1200px;
-            justify-content: center; 
-            align-items: center; 
-            gap: 12px; 
-            position: relative; 
-            z-index: 5; 
+        /* --- UI HUD (TOP BAR) --- */
+        #production-hud {
+            height: 14vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 500;
+            border-bottom: 2px solid var(--ui-border);
+            padding-bottom: 12px;
+            box-sizing: border-box;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+        }
+
+        #world-name-display {
+            font-size: clamp(20px, 5vw, 30px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--roblox-blue);
+            text-shadow: var(--text-glow);
+        }
+
+        .hud-stats-row {
+            display: flex;
+            gap: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 4px 0;
+            letter-spacing: 1.5px;
+        }
+
+        #meter-container {
+            width: 75%;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2.5px solid white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        #meter-fill-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--roblox-green);
+            box-shadow: 0 0 15px var(--roblox-green);
+            transition: width 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        /* --- THE GAME VIEWPORT (ASPECT RATIO PROTECTED) --- */
+        #engine-viewport {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
             padding: 10px;
             box-sizing: border-box;
         }
 
-        /* 6. SIDEBARS: HOLD & NEXT */
-        .sidebar { 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
+        .engine-sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 15px; 
-            width: 18vw; 
-            max-width: 85px; 
-            text-align: center; 
+            gap: 15px;
+            width: 15vw;
+            max-width: 90px;
         }
+
         .sidebar-label {
-            font-size: 11px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px black;
-        }
-        .box { 
-            background: var(--ui-bg-dark); 
-            border: 4px solid #FFF; 
-            border-radius: 18px; 
-            width: 75px; 
-            height: 75px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4); 
-        }
-
-        /* 7. DANTE CHARACTER AVATAR */
-        #dante-avatar { 
-            position: absolute; 
-            top: -75px; 
-            left: 5px; 
-            width: 65px; 
-            height: 65px; 
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            z-index: 20;
-        }
-        #dante-avatar img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.6)); 
-        }
-
-        /* 8. THE GAME GRID - STRETCH PROTECTION */
-        #game-container { 
-            position: relative; 
-            height: 95%; 
-            aspect-ratio: 10 / 20; /* Verified Tetris Dimensions */
-            border: 8px solid #FFF; 
-            border-radius: 28px; 
-            background: rgba(0, 0, 0, 0.5); 
-            overflow: hidden; 
-            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        canvas#tetris { 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
-            image-rendering: auto;
-        }
-
-        /* 9. PROGRESSION HUD */
-        #progress-container { 
-            width: 75%; 
-            height: 16px; 
-            background: rgba(255, 255, 255, 0.25); 
-            border: 3px solid #FFF; 
-            border-radius: 12px; 
-            margin: 8px auto; 
-            overflow: hidden; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-        }
-        #progress-fill { 
-            width: 0%; 
-            height: 100%; 
-            background: var(--roblox-green); 
-            box-shadow: 0 0 20px var(--roblox-green); 
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-
-        /* 10. TOUCH CONTROLS - BOTTOM BAR (15% HEIGHT) */
-        .bottom-bar { 
-            display: flex; 
-            gap: 30px; 
-            padding: 10px; 
-            height: 15vh; 
-            width: 100%; 
-            justify-content: center; 
-            align-items: center;
-            background: rgba(0, 0, 0, 0.5); 
-            box-sizing: border-box;
-            z-index: 10;
-            border-top: 2px solid rgba(255,255,255,0.1);
-        }
-        .action-btn { 
-            width: 115px; 
-            height: 80px; 
-            border-radius: 22px; 
-            border: 5px solid #FFF; 
-            background: var(--roblox-blue); 
-            font-size: 34px; 
-            color: white; 
-            box-shadow: 0 8px 0px #0077be; 
-            cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .action-btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #0077be; }
-
-        /* 11. OVERLAY ARCHITECTURE */
-        #start-overlay, #overlay { 
-            position: absolute; 
-            inset: 0; 
-            background: var(--roblox-blue); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            text-align: center; 
-            padding: 40px; 
-            box-sizing: border-box; 
-        }
-        .overlay-btn { 
-            padding: 22px 55px; 
-            background: var(--roblox-green); 
-            color: white; 
-            border: 6px solid white; 
-            border-radius: 60px; 
-            font-size: 32px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            box-shadow: 0 10px 0px #009624; 
-            margin-top: 25px; 
+            font-size: 10px;
+            font-weight: 900;
+            color: rgba(255,255,255,0.4);
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
-        .overlay-btn:active { transform: translateY(4px); box-shadow: 0 6px 0px #009624; }
-        
-        #win-image { 
-            width: 260px; 
-            margin-bottom: 25px; 
-            display: none; 
-            border-radius: 25px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
-            border: 4px solid white;
+
+        .sidebar-module {
+            background: var(--ui-glass);
+            border: 4px solid #FFF;
+            border-radius: 25px;
+            width: 85px;
+            height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
         }
-        
-        #mute-btn { 
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            width: 55px; 
-            height: 55px; 
-            background: rgba(255, 255, 255, 0.35); 
-            border: 3px solid #FFF; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1100; 
-            font-size: 28px; 
-            cursor: pointer; 
+
+        /* DANTE AVATAR - PINNED TO HOLD BOX */
+        #dante-avatar-anchor {
+            position: absolute;
+            top: -85px;
+            left: 5px;
+            width: 75px;
+            height: 75px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 600;
+        }
+        #dante-avatar-anchor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
+        }
+
+        /* THE GRID - NO STRETCHING ALLOWED */
+        #grid-container {
+            position: relative;
+            height: 98%;
+            aspect-ratio: 10 / 20;
+            border: 8px solid #FFF;
+            border-radius: 40px;
+            background: rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas#master-render-surface {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* --- PRODUCTION OVERLAYS --- */
+        .full-screen-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            box-sizing: border-box;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        #state-gateway { background: linear-gradient(135deg, var(--roblox-blue), #003a5c); }
+        #state-notification { background: rgba(0,0,0,0.94); display: none; }
+
+        .native-action-btn {
+            padding: 24px 65px;
+            background: var(--roblox-green);
+            color: white;
+            border: 6px solid white;
+            border-radius: 70px;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 0 14px 0px #006b1a;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .native-action-btn:active { transform: translateY(8px); box-shadow: 0 6px 0px #006b1a; }
+
+        #win-prize-graphic {
+            width: 300px;
+            border-radius: 35px;
+            border: 8px solid white;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+        }
+
+        /* --- BOTTOM CONTROL BAR (15% HEIGHT) --- */
+        #interaction-shelf {
+            height: 16vh;
+            width: 100%;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 3px solid var(--ui-border);
+            z-index: 500;
+        }
+
+        .control-shelf-btn {
+            width: 130px;
+            height: 100px;
+            border-radius: 30px;
+            border: 6px solid white;
+            background: linear-gradient(to bottom, var(--roblox-blue), #006dad);
+            font-size: 48px;
+            color: white;
+            box-shadow: 0 12px 0px #004d7a;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #mute-toggle-system {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: rgba(255,255,255,0.3);
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+            font-size: 32px;
+            backdrop-filter: blur(15px);
+            cursor: pointer;
         }
     </style>
 </head>
 
-<body onpointerdown="unlockAudio()">
+<body onpointerdown="triggerEngineAudioWakeup()">
 
-    <div id="mute-btn" onclick="toggleMute()">🔊</div>
+    <div id="mute-toggle-system" onclick="handleMuteToggle()">🔊</div>
 
-    <div class="cloud" style="width:160px; height:55px; top:12%; animation: drift 38s linear infinite;"></div>
-    <div class="cloud" style="width:220px; height:75px; top:38%; animation: drift 52s linear reverse infinite;"></div>
+    <div class="cloud-drift" style="width:220px; height:65px; top:15%; animation: driftSky 45s linear infinite;"></div>
+    <div class="cloud-drift" style="width:320px; height:95px; top:45%; animation: driftSky 62s linear reverse infinite;"></div>
 
-    <div id="start-overlay">
-        <img src="Dante_App_Logo.png" style="width:180px; margin-bottom:25px; filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.3));">
-        <h1 style="font-size: 52px; margin: 0; text-shadow: 5px 5px 0px rgba(0,0,0,0.3);">DANTE'S RINGS</h1>
-        <p style="font-size: 22px; margin: 10px 0 30px 0;">A Future Vibrant Self Adventure</p>
-        <button class="overlay-btn" onclick="startGame()">START ADVENTURE</button>
+    <div id="state-gateway" class="full-screen-overlay">
+        <img src="Dante_App_Logo.png" style="width:240px; margin-bottom:30px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));">
+        <h1 style="font-size: 68px; margin: 0; letter-spacing: 5px; text-shadow: 6px 6px 0px rgba(0,0,0,0.4);">DANTE'S RINGS</h1>
+        <p style="font-size: 28px; color: #CAF0FF; margin-bottom: 45px;">A Future Vibrant Self Adventure</p>
+        <button class="native-action-btn" onclick="requestAdventureSession()">START ADVENTURE</button>
     </div>
 
-    <div id="ui-header">
-        <b id="level-title" style="font-size: 26px; text-transform: uppercase;">Underwater World</b>
-        <div style="font-size: 22px; margin: 4px 0;">Score: <span id="score">0</span> | Lines: <span id="lines-count">0</span></div>
-        <div id="progress-container"><div id="progress-fill"></div></div>
+    <div id="production-hud">
+        <b id="world-name-display">Underwater World</b>
+        <div class="hud-stats-row">
+            <span>SCORE: <b id="ui-val-score">0</b></span>
+            <span>LINES: <b id="ui-val-lines">0</b></span>
+        </div>
+        <div id="meter-container"><div id="meter-fill-bar"></div></div>
     </div>
     
-    <div id="main-layout">
-        <div class="sidebar">
+    <div id="game-viewport">
+        <div class="viewport-sidebar">
             <span class="sidebar-label">HOLD</span>
-            <div class="box">
-                <div id="dante-avatar"><img src="Dante_App_Logo.png" id="dante-img"></div>
-                <canvas id="hold-canvas" width="50" height="50"></canvas>
+            <div class="sidebar-module">
+                <div id="dante-avatar-anchor">
+                    <img src="Dante_App_Logo.png" id="dante-sprite">
+                </div>
+                <canvas id="canvas-hold-module" width="50" height="50"></canvas>
             </div>
         </div>
 
-        <div id="game-container">
-            <canvas id="tetris" width="200" height="400"></canvas>
+        <div id="engine-grid-container">
+            <canvas id="master-render-surface" width="200" height="400"></canvas>
             
-            <div id="overlay" style="display:none; background: rgba(0, 0, 0, 0.96);">
-                <img id="win-image" src="Youwin.png">
-                <h2 id="overlay-title" style="font-size: 38px; margin: 15px 0; color: var(--roblox-blue);">PAUSED</h2>
-                <p id="overlay-text" style="font-size:20px; max-width:320px; line-height: 1.5; margin: 15px 0;"></p>
-                <button class="overlay-btn" id="overlay-primary-btn" onclick="handleOverlayAction()">CONTINUE</button>
+            <div id="state-notification" class="full-screen-overlay">
+                <img id="win-prize-graphic" src="Youwin.png">
+                <h2 id="ov-msg-title" style="font-size: 56px; color: var(--roblox-blue); margin: 0 0 20px 0;">PAUSED</h2>
+                <p id="ov-msg-body" style="font-size:26px; max-width:450px; line-height: 1.6; margin-bottom: 35px;"></p>
+                <button class="native-action-btn" id="ov-msg-btn" onclick="executeOverlayTransition()">CONTINUE</button>
             </div>
         </div>
 
-        <div class="sidebar">
+        <div class="viewport-sidebar">
             <span class="sidebar-label">NEXT</span>
-            <div class="box"><canvas id="next-canvas" width="50" height="50"></canvas></div>
+            <div class="sidebar-module">
+                <canvas id="canvas-next-module" width="50" height="50"></canvas>
+            </div>
         </div>
     </div>
 
-    <div class="bottom-bar">
-        <button class="action-btn" onpointerdown="playerHold()" title="Hold Piece">📦</button>
-        <button class="action-btn" onpointerdown="playerRotate(1)" title="Rotate Ring">🔄</button>
+    <div id="interaction-shelf">
+        <button class="control-shelf-btn" onpointerdown="handlePieceHoldRequest()">📦</button>
+        <button class="control-shelf-btn" onpointerdown="handlePieceRotateRequest()">🔄</button>
     </div>
 
 <script>
 /**
- * DANTE'S RINGS: THE CORE ENGINE
- * --------------------------------------------------
- * Thorough manual verification:
- * - iPhone/iPad Aspect Ratio Locking [Verified]
- * - .m4a Minecraft-Style Audio Engine [Verified]
- * - Roblox Skybox + Drifting Clouds [Verified]
- * - Hello Kitty Visual Logic (Pieces 1 & 2) [Verified]
- * - Future Vibrant Self Narrative Arc [Verified]
+ * ========================================================================================
+ * DANTE'S RINGS: THE ULTIMATE PRODUCTION ENGINE
+ * ========================================================================================
  */
 
-// --- I. DOM & ENGINE CONFIGURATION ---
-const canvas = document.getElementById('tetris');
-const ctx = canvas.getContext('2d');
-const hctx = document.getElementById('hold-canvas').getContext('2d');
-const nctx = document.getElementById('next-canvas').getContext('2d');
+// --- I. CORE CONFIGURATION OBJECT ---
+const CONFIG = {
+    GEOMETRY: { COLS: 10, ROWS: 20, SCALE: 20 },
+    COLORS: [
+        null,
+        '#FF1493', // 1: Hello Kitty Pink
+        '#FFD700', // 2: Hello Kitty Yellow
+        '#A020F0', // 3: Pandora Purple
+        '#00E5FF', // 4: Sky Cyan
+        '#FF4500', // 5: Sun Orange
+        '#39FF14', // 6: Jungle Green
+        '#FF0000'  // 7: School Red
+    ],
+    NARRATIVE: [
+        "Underwater: Dante learns to breathe beneath the surface of his own feelings.",
+        "Pandora: Curiosity opens new colors in Dante's sky.",
+        "Minecraft: Dante discovers he can rebuild any pattern he breaks.",
+        "Lego World: Dante plays with structure instead of fearing it.",
+        "Rainforest: Dante trusts growth he cannot yet see.",
+        "Outer Space: Dante finds stillness in the vast unknown.",
+        "Jungle: Dante follows instinct, moving piece by piece.",
+        "School: Dante realizes every mis-drop is a lesson.",
+        "Sun Surface: Dante holds his shape even in the heat.",
+        "Dream World: Dante wakes up inside his own imagination."
+    ],
+    LEVELS: [
+        { name: "Underwater World", bg: "rgba(0, 168, 255, 0.4)", target: 30, speed: 1000 },
+        { name: "Pandora", bg: "rgba(106, 13, 173, 0.4)", target: 60, speed: 900 },
+        { name: "Minecraft", bg: "rgba(124, 252, 0, 0.4)", target: 90, speed: 820 },
+        { name: "Legoworld", bg: "rgba(255, 0, 0, 0.4)", target: 120, speed: 750 },
+        { name: "Rainforest", bg: "rgba(0, 100, 0, 0.4)", target: 150, speed: 680 },
+        { name: "Outer Space", bg: "rgba(0, 0, 34, 0.6)", target: 180, speed: 600 },
+        { name: "Jungle", bg: "rgba(34, 139, 34, 0.4)", target: 210, speed: 520 },
+        { name: "School", bg: "rgba(47, 79, 79, 0.4)", target: 240, speed: 450 },
+        { name: "Sun Surface", bg: "rgba(255, 69, 0, 0.4)", target: 270, speed: 380 },
+        { name: "Dream World", bg: "rgba(255, 182, 193, 0.5)", target: 350, speed: 320 }
+    ]
+};
 
-const overlay = document.getElementById('overlay');
-const overlayTitle = document.getElementById('overlay-title');
-const overlayText = document.getElementById('overlay-text');
-const overlayPrimaryBtn = document.getElementById('overlay-primary-btn');
-const winImage = document.getElementById('win-image');
-const progressFill = document.getElementById('progress-fill');
-const danteBox = document.getElementById('dante-avatar');
-const levelTitleText = document.getElementById('level-title');
+// --- II. REFS MAP (EXPLICIT DOM BINDINGS) ---
+const Refs = {
+    canvas: document.getElementById('master-render-surface'),
+    ctx: document.getElementById('master-render-surface').getContext('2d'),
+    holdCtx: document.getElementById('canvas-hold-module').getContext('2d'),
+    nextCtx: document.getElementById('canvas-next-module').getContext('2d'),
+    
+    overlay: document.getElementById('state-notification'),
+    ovTitle: document.getElementById('ov-msg-title'),
+    ovBody: document.getElementById('ov-msg-body'),
+    ovBtn: document.getElementById('ov-msg-btn'),
+    ovWin: document.getElementById('win-prize-graphic'),
+    
+    score: document.getElementById('ui-val-score'),
+    lines: document.getElementById('ui-val-lines'),
+    meter: document.getElementById('meter-fill-bar'),
+    world: document.getElementById('world-name-display'),
+    avatar: document.getElementById('dante-avatar-anchor')
+};
 
-const GRID_W = 10;
-const GRID_H = 20;
-const SCALE = 20;
+// Apply Static Canvas Scalling
+Refs.ctx.scale(CONFIG.GEOMETRY.SCALE, CONFIG.GEOMETRY.SCALE);
+Refs.holdCtx.scale(12, 12);
+Refs.nextCtx.scale(12, 12);
 
-// Initialize Scaling
-ctx.scale(SCALE, SCALE); 
-hctx.scale(12, 12); 
-nctx.scale(12, 12);
+// --- III. AUDIO SUBSYSTEM (.M4A MASTER) ---
+const AudioEngine = {
+    context: new (window.AudioContext || window.webkitAudioContext)(),
+    soundtrack: new Audio('Dantesgamemusic.m4a'),
+    unlocked: false,
+    muted: false,
 
-// --- II. AUDIO ARCHITECTURE (IPAD COMPLIANT) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const bgMusic = new Audio('Dantesgamemusic.m4a');
-bgMusic.loop = true; 
-bgMusic.volume = 0.45;
+    /**
+     * Initializes the context to bypass iPad silent-mode blocks.
+     */
+    async unlock() {
+        if (this.unlocked) return;
+        if (this.context.state === 'suspended') await this.context.resume();
+        this.soundtrack.loop = true;
+        this.soundtrack.volume = 0.45;
+        this.unlocked = true;
+        console.log("AUDIO: Production Soundstream Established.");
+    },
 
-let audioUnlocked = false;
-let isMuted = false;
+    playTheme() { if (!this.muted) this.soundtrack.play().catch(() => {}); },
+    pauseTheme() { this.soundtrack.pause(); },
 
-/**
- * Resumes AudioContext on first tap to bypass mobile security blocks.
- */
-function unlockAudio() {
-    if (!audioUnlocked) {
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
+    /**
+     * Synthesizes digital tones for high-latency-free SFX.
+     */
+    playSfx(freq, type, duration) {
+        if (this.muted || !this.unlocked) return;
+        const osc = this.context.createOscillator();
+        const gain = this.context.createGain();
+        osc.type = type; 
+        osc.frequency.setValueAtTime(freq, this.context.currentTime);
+        gain.gain.setValueAtTime(0.12, this.context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.context.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.context.destination);
+        osc.start();
+        osc.stop(this.context.currentTime + duration);
+    }
+};
+
+function triggerEngineAudioWakeup() { AudioEngine.unlock(); }
+function handleMuteToggle() {
+    AudioEngine.muted = !AudioEngine.muted;
+    AudioEngine.soundtrack.muted = AudioEngine.muted;
+    document.getElementById('mute-toggle-system').innerText = AudioEngine.muted ? '🔇' : '🔊';
+}
+
+// --- IV. FX ENGINE: PARTICLES & VIBRANT STREAKS ---
+const EffectsEngine = {
+    activeParticles: [],
+    streakTrail: [], // Stores movement history for the "Vibrant Streak"
+
+    /**
+     * Spawns physics particles for line clear explosion.
+     */
+    spawnExplosion(x, y, color) {
+        for (let i = 0; i < 12; i++) {
+            this.activeParticles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: (Math.random() - 0.5) * 0.7,
+                life: 1.0,
+                color: color
+            });
         }
-        bgMusic.play().catch(e => console.log("System: Audio ready, awaiting start button."));
-        audioUnlocked = true;
+    },
+
+    /**
+     * Buffers the current piece position for the trail effect.
+     */
+    bufferTrail(matrix, pos) {
+        this.streakTrail.push({
+            matrix: JSON.parse(JSON.stringify(matrix)),
+            pos: { x: pos.x, y: pos.y },
+            life: 1.0
+        });
+        // Limit trail length to 6 frames for performance
+        if (this.streakTrail.length > 6) this.streakTrail.shift();
+    },
+
+    update() {
+        // Update Line Particles
+        for (let i = this.activeParticles.length - 1; i >= 0; i--) {
+            const p = this.activeParticles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.life -= 0.035;
+            if (p.life <= 0) this.activeParticles.splice(i, 1);
+        }
+        // Update Trail Decay
+        this.streakTrail.forEach(t => t.life -= 0.18);
+        this.streakTrail = this.streakTrail.filter(t => t.life > 0);
+    },
+
+    render(c) {
+        // A. Draw Vibrant Streaks (Behind pieces)
+        this.streakTrail.forEach(t => {
+            c.globalAlpha = t.life * 0.25;
+            t.matrix.forEach((row, y) => row.forEach((val, x) => {
+                if (val !== 0) {
+                    c.fillStyle = CONFIG.COLORS[val];
+                    c.beginPath(); 
+                    c.arc(x + t.pos.x + 0.5, y + t.pos.y + 0.5, 0.45, 0, Math.PI * 2); 
+                    c.fill();
+                }
+            }));
+        });
+        
+        // B. Draw Physics Particles
+        this.activeParticles.forEach(p => {
+            c.globalAlpha = p.life;
+            c.fillStyle = p.color;
+            c.fillRect(p.x, p.y, 0.18, 0.18);
+        });
+        c.globalAlpha = 1.0;
     }
-}
+};
 
-function toggleMute() {
-    isMuted = !isMuted;
-    bgMusic.muted = isMuted;
-    document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊';
-}
-
-/**
- * Synthesizes SFX tones without external files for performance.
- */
-function playTone(freq, type, duration) {
-    if (isMuted || !audioUnlocked) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+// --- V. THE CORE GAMEPLAY ENGINE ---
+const Game = {
+    arena: Array.from({length: CONFIG.GEOMETRY.ROWS}, () => Array(CONFIG.GEOMETRY.COLS).fill(0)),
+    player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
     
-    osc.type = type; // 'sine', 'square', 'sawtooth'
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    nextPiece: null,
+    heldPiece: null,
+    canHoldPiece: true,
+    linesTotal: 0,
+    currentLevel: 0,
     
-    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    paused: true,
+    dropCounter: 0,
+    lastTime: 0,
+    dropInterval: 1000,
     
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-}
+    shakeStr: 0,
 
-// --- III. GAMEPLAY DATA & STORYTELLING ARC ---
-const ringStory = [
-    "Underwater: Dante learns to breathe beneath the surface of his feelings.",
-    "Pandora: Curiosity opens new colors in Dante's sky.",
-    "Minecraft: Dante discovers he can rebuild any pattern he breaks.",
-    "Lego World: Dante plays with structure instead of fearing it.",
-    "Rainforest: Dante trusts growth he cannot yet see.",
-    "Outer Space: Dante finds stillness in the vast unknown.",
-    "Jungle: Dante follows instinct, moving piece by piece.",
-    "School: Dante realizes every mis-drop is a lesson.",
-    "Sun Surface: Dante holds his shape even in the heat.",
-    "Dream World: Dante wakes up inside his own imagination."
-];
+    /**
+     * Initializes the full logic reset.
+     */
+    reset() {
+        this.arena.forEach(row => row.fill(0));
+        this.linesTotal = 0; 
+        this.player.score = 0; 
+        this.currentLevel = 0;
+        this.heldPiece = null; 
+        this.nextPiece = null;
+        this.dropInterval = CONFIG.LEVELS[0].speed;
+        
+        this.refreshHUDDisplay();
+        Refs.overlay.style.display = 'none';
+        this.paused = false;
+        
+        this.spawnNewRing();
+        AudioEngine.playTheme();
+        requestAnimationFrame(this.mainLoop.bind(this));
+    },
 
-const themes = [
-    { name: "Underwater World", bg: "rgba(0, 168, 255, 0.4)", body: "#005b96", target: 30, speed: 1000 },
-    { name: "Pandora", bg: "rgba(106, 13, 173, 0.4)", body: "#32004f", target: 60, speed: 900 },
-    { name: "Minecraft", bg: "rgba(124, 252, 0, 0.4)", body: "#556b2f", target: 90, speed: 820 },
-    { name: "Legoworld", bg: "rgba(255, 0, 0, 0.4)", body: "#b22222", target: 120, speed: 750 },
-    { name: "Rainforest", bg: "rgba(0, 100, 0, 0.4)", body: "#004d00", target: 150, speed: 680 },
-    { name: "Outer Space", bg: "rgba(0, 0, 34, 0.6)", body: "#000011", target: 180, speed: 600 },
-    { name: "Jungle", bg: "rgba(34, 139, 34, 0.4)", body: "#1a471a", target: 210, speed: 520 },
-    { name: "School", bg: "rgba(47, 79, 79, 0.4)", body: "#1c2e2e", target: 240, speed: 450 },
-    { name: "Sun Surface", bg: "rgba(255, 69, 0, 0.4)", body: "#ff4500", target: 270, speed: 380 },
-    { name: "Dream World", bg: "rgba(255, 182, 193, 0.5)", body: "#d8bfd8", target: 350, speed: 320 }
-];
+    /**
+     * Pulls the next piece from queue and centers it.
+     */
+    spawnNewRing() {
+        const shapeKeys = 'ILJOTSZ';
+        this.player.matrix = this.nextPiece || this.generatePiece(shapeKeys[Math.random() * shapeKeys.length | 0]);
+        this.nextPiece = this.generatePiece(shapeKeys[Math.random() * shapeKeys.length | 0]);
+        
+        this.player.pos.y = 0;
+        this.player.pos.x = (CONFIG.GEOMETRY.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
+        this.canHoldPiece = true;
+        
+        if (this.detectCollision()) {
+            AudioEngine.playSfx(150, 'sawtooth', 0.65);
+            this.setStateNotification("STACKED OUT!", "Breathe. notice the pattern you're building. Every step is growth.", false);
+        }
+    },
 
-// --- IV. CORE GAMEPLAY ENGINE ---
-const arena = Array.from({length: GRID_H}, () => Array(GRID_W).fill(0));
-const player = { pos: {x: 0, y: 0}, matrix: null, score: 0 };
+    generatePiece(type) {
+        if (type === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
+        if (type === 'L') return [[0,2,0],[0,2,0],[0,2,2]];
+        if (type === 'J') return [[0,3,0],[0,3,0],[3,3,0]];
+        if (type === 'O') return [[4,4],[4,4]];
+        if (type === 'Z') return [[5,5,0],[0,5,5],[0,0,0]];
+        if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+        if (type === 'T') return [[0,7,0],[7,7,7],[0,0,0]];
+    },
 
-let nextPiece = null;
-let heldPiece = null;
-let canHold = true;
-let totalLines = 0;
-let currentLevelIndex = 0;
-
-let isPaused = true;
-let dropCounter = 0;
-let lastTime = 0;
-let dropInterval = 1000;
-
-/**
- * Tetromino Matrix Definitions
- */
-function createPiece(type) {
-    switch (type) {
-        case 'I': return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
-        case 'L': return [[0,2,0],[0,2,0],[0,2,2]];
-        case 'J': return [[0,3,0],[0,3,0],[3,3,0]];
-        case 'O': return [[4,4],[4,4]];
-        case 'Z': return [[5,5,0],[0,5,5],[0,0,0]];
-        case 'S': return [[0,6,6],[6,6,0],[0,0,0]];
-        case 'T': return [[0,7,0],[7,7,7],[0,0,0]];
-    }
-}
-
-/**
- * Initializes the game and clears overlays.
- */
-function startGame() {
-    unlockAudio();
-    document.getElementById('start-overlay').style.display = 'none';
-    softReset();
-}
-
-/**
- * State reset for new games or "Stack Outs".
- */
-function softReset() {
-    arena.forEach(row => row.fill(0));
-    totalLines = 0; 
-    player.score = 0; 
-    currentLevelIndex = 0;
-    heldPiece = null; 
-    nextPiece = null;
-    dropInterval = themes[0].speed;
-    levelTitleText.innerText = themes[0].name;
-    
-    updateUI();
-    overlay.style.display = 'none';
-    isPaused = false;
-    
-    playerReset();
-    if (!isMuted) bgMusic.play();
-    requestAnimationFrame(update);
-}
-
-/**
- * Spawns a new piece and checks for Game Over.
- */
-function playerReset() {
-    const pieces = 'ILJOTSZ';
-    player.matrix = nextPiece || createPiece(pieces[Math.random() * pieces.length | 0]);
-    nextPiece = createPiece(pieces[Math.random() * pieces.length | 0]);
-    
-    player.pos.y = 0;
-    player.pos.x = (GRID_W / 2 | 0) - (player.matrix[0].length / 2 | 0);
-    
-    canHold = true;
-    
-    if (collide(arena, player)) {
-        playTone(150, 'sawtooth', 0.5);
-        showOverlay("STACKED OUT!", "Breathe and try again. Every pattern you build is a step toward your Dream World.", false);
-    }
-}
-
-/**
- * Collision Detection logic.
- */
-function collide(arena, p) {
-    const [m, o] = [p.matrix, p.pos];
-    for (let y = 0; y < m.length; ++y) {
-        for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
+    /**
+     * Advanced Collision Detection Module.
+     */
+    detectCollision(arena = this.arena, player = this.player) {
+        const [m, o] = [player.matrix, player.pos];
+        for (let y = 0; y < m.length; ++y) {
+            for (let x = 0; x < m[y].length; ++x) {
+                if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+                    return true;
+                }
             }
         }
-    }
-    return false;
-}
+        return false;
+    },
 
-/**
- * Commits a piece to the arena.
- */
-function merge(arena, p) {
-    p.matrix.forEach((row, y) => row.forEach((v, x) => { 
-        if (v !== 0) arena[y + p.pos.y][x + p.pos.x] = v; 
-    }));
-}
+    /**
+     * Locks piece into the static arena and triggers particle burst.
+     */
+    mergeIntoArena() {
+        this.player.matrix.forEach((row, y) => {
+            row.forEach((val, x) => {
+                if (val !== 0) {
+                    this.arena[y + this.player.pos.y][x + this.player.pos.x] = val;
+                    EffectsEngine.spawnExplosion(x + this.player.pos.x, y + this.player.pos.y, CONFIG.COLORS[val]);
+                }
+            });
+        });
+    },
 
-/**
- * Scans for full lines and triggers animations.
- */
-function arenaSweep() {
-    let rowCount = 0;
-    for (let y = arena.length - 1; y >= 0; --y) {
-        if (arena[y].every(v => v !== 0)) {
-            arena.splice(y, 1);
-            arena.unshift(new Array(GRID_W).fill(0));
-            rowCount++;
-            y++; // Check same row index again as lines shifted down
+    /**
+     * Scans for complete rows and triggers Haptic Shake.
+     */
+    sweepFullRows() {
+        let cleared = 0;
+        for (let y = this.arena.length - 1; y >= 0; --y) {
+            if (this.arena[y].every(cell => cell !== 0)) {
+                this.arena.splice(y, 1);
+                this.arena.unshift(new Array(CONFIG.GEOMETRY.COLS).fill(0));
+                cleared++;
+                y++; 
+            }
         }
-    }
-    if (rowCount > 0) {
-        totalLines += rowCount;
-        player.score += rowCount * 10;
-        playTone(523, 'sine', 0.2); 
-        updateUI();
+        if (cleared > 0) {
+            this.linesTotal += cleared;
+            this.player.score += cleared * 10;
+            this.shakeStr = 14; // Intensity of Haptic Shake
+            AudioEngine.playSfx(523, 'sine', 0.25);
+            this.refreshHUDDisplay();
+            this.animateDanteJump();
+        }
+    },
+
+    refreshHUDDisplay() {
+        Refs.score.innerText = this.player.score;
+        Refs.lines.innerText = this.linesTotal;
         
-        // Dante Jump Animation
-        danteBox.style.transform = 'scale(1.5) translateY(-20px)';
-        setTimeout(() => danteBox.style.transform = 'scale(1) translateY(0)', 300);
-    }
-}
+        const world = CONFIG.LEVELS[this.currentLevel];
+        const prevCap = this.currentLevel > 0 ? CONFIG.LEVELS[this.currentLevel - 1].target : 0;
+        const progress = Math.max(0, Math.min(100, ((this.linesTotal - prevCap) / (world.target - prevCap) * 100)));
+        Refs.meter.style.width = progress + '%';
 
-/**
- * Progression logic and Win Checks.
- */
-function updateUI() {
-    document.getElementById('score').innerText = player.score;
-    document.getElementById('lines-count').innerText = totalLines;
-    
-    const th = themes[currentLevelIndex];
-    const prev = currentLevelIndex > 0 ? themes[currentLevelIndex - 1].target : 0;
-    const progress = totalLines - prev;
-    const needed = th.target - prev;
-    
-    const pct = Math.max(0, Math.min(100, (progress / needed) * 100));
-    progressFill.style.width = pct + '%';
-
-    // WIN CONDITION
-    if (currentLevelIndex === themes.length - 1 && totalLines >= th.target) {
-        showOverlay("YOU REACHED DREAM WORLD!", "Dante climbed every ring. The Self you are rehearsing is now complete.", true);
-        return;
-    }
-    
-    // LEVEL UP
-    if (totalLines >= th.target && currentLevelIndex < themes.length - 1) {
-        currentLevelIndex++;
-        dropInterval = themes[currentLevelIndex].speed;
-        levelTitleText.innerText = themes[currentLevelIndex].name;
-        playTone(880, 'square', 0.5);
-        showOverlay(themes[currentLevelIndex].name, ringStory[currentLevelIndex], false);
-    }
-}
-
-/**
- * Handles UI Overlays for Pause, Story, and Game Over.
- */
-function showOverlay(title, text, isWin) {
-    isPaused = true; 
-    bgMusic.pause();
-    
-    overlayTitle.innerText = title;
-    overlayText.innerText = text;
-    winImage.style.display = isWin ? 'block' : 'none';
-    
-    if (isWin) overlayPrimaryBtn.innerText = "PLAY AGAIN";
-    else if (title === "STACKED OUT!") overlayPrimaryBtn.innerText = "START AGAIN";
-    else overlayPrimaryBtn.innerText = "CONTINUE";
-    
-    overlay.style.display = 'flex';
-}
-
-function handleOverlayAction() {
-    unlockAudio();
-    if (overlayPrimaryBtn.innerText === "CONTINUE") {
-        overlay.style.display = 'none';
-        isPaused = false;
-        if (!isMuted) bgMusic.play();
-        requestAnimationFrame(update);
-    } else {
-        softReset();
-    }
-}
-
-// --- V. TOUCH & GESTURE ENGINE (IOS OPTIMIZED) ---
-let touchStartX = 0, touchStartY = 0, didMove = false;
-
-canvas.addEventListener('touchstart', e => {
-    if (isPaused) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    didMove = false;
-}, {passive: false});
-
-canvas.addEventListener('touchmove', e => {
-    if (isPaused) return;
-    e.preventDefault(); // Lock browser scrolling
-    
-    const tx = e.touches[0].clientX;
-    const ty = e.touches[0].clientY;
-    const dx = tx - touchStartX;
-    const dy = ty - touchStartY;
-    
-    // 10px Jitter Buffer
-    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) didMove = true;
-
-    // Tactile Drag: Horizontal Slide
-    if (Math.abs(dx) > 35) {
-        const dir = dx > 0 ? 1 : -1;
-        player.pos.x += dir;
-        if (collide(arena, player)) {
-            player.pos.x -= dir;
-        } else {
-            playTone(400, 'sine', 0.05);
+        // WIN CONDITION CHECK
+        if (this.currentLevel === CONFIG.LEVELS.length - 1 && this.linesTotal >= world.target) {
+            this.setStateNotification("YOU REACHED DREAM WORLD!", "Dante is home in his own imagination.", true);
+            return;
         }
-        touchStartX = tx; // Reset anchor for smooth continuous drag
+        
+        // LEVEL UP CHECK
+        if (this.linesTotal >= world.target && this.currentLevel < CONFIG.LEVELS.length - 1) {
+            this.currentLevel++;
+            this.dropInterval = CONFIG.LEVELS[this.currentLevel].speed;
+            Refs.world.innerText = CONFIG.LEVELS[this.currentLevel].name;
+            AudioEngine.playSfx(880, 'square', 0.45);
+            this.setStateNotification(CONFIG.LEVELS[this.currentLevel].name, CONFIG.STORY[this.currentLevel], false);
+        }
+    },
+
+    animateDanteJump() {
+        Refs.avatar.style.transform = 'scale(1.8) translateY(-40px)';
+        setTimeout(() => Refs.avatar.style.transform = 'scale(1) translateY(0)', 350);
+    },
+
+    setStateNotification(title, msg, winFlag) {
+        this.paused = true;
+        AudioEngine.pauseTheme();
+        Refs.ovTitle.innerText = title;
+        Refs.ovBody.innerText = msg;
+        Refs.ovWin.style.display = winFlag ? 'block' : 'none';
+        Refs.ovBtn.innerText = winFlag ? "PLAY AGAIN" : (title === "STACKED OUT!" ? "START AGAIN" : "CONTINUE");
+        Refs.overlay.style.display = 'flex';
+    },
+
+    /**
+     * MAIN PHYSICS LOOP (60FPS Target)
+     */
+    mainLoop(timestamp = 0) {
+        if (this.paused) return;
+        
+        const delta = timestamp - this.lastTime;
+        this.lastTime = timestamp;
+        
+        this.dropCounter += delta;
+        if (this.dropCounter > this.dropInterval) {
+            this.executeGravityDrop();
+            this.dropCounter = 0;
+        }
+        
+        this.performRenderCall();
+        requestAnimationFrame(this.mainLoop.bind(this));
+    },
+
+    executeGravityDrop() {
+        this.player.pos.y++;
+        if (this.detectCollision()) {
+            this.player.pos.y--;
+            this.mergeIntoArena();
+            this.sweepFullRows();
+            this.spawnNewRing();
+            AudioEngine.playSfx(200, 'sine', 0.12);
+        }
+        // Save history for "Vibrant Streak"
+        EffectsEngine.bufferTrail(this.player.matrix, this.player.pos);
+    },
+
+    performRenderCall() {
+        // 1. Calculate Haptic Shake Translation
+        let sx = 0, sy = 0;
+        if (this.shakeStr > 0) {
+            sx = (Math.random() - 0.5) * this.shakeStr * 0.18;
+            sy = (Math.random() - 0.5) * this.shakeStr * 0.18;
+            this.shakeStr *= 0.88; // Decay shake intensity
+        }
+
+        Refs.ctx.save();
+        Refs.ctx.translate(sx, sy);
+        
+        // 2. Clear Scene & Draw Theme Background
+        Refs.ctx.fillStyle = CONFIG.LEVELS[this.currentLevel].bg;
+        Refs.ctx.fillRect(0, 0, Refs.canvas.width, Refs.canvas.height);
+        
+        // 3. Render Roblox Grid Lines
+        Refs.ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+        Refs.ctx.lineWidth = 0.035;
+        for(let x=0; x<=CONFIG.GEOMETRY.COLS; x++) { 
+            Refs.ctx.beginPath(); Refs.ctx.moveTo(x,0); Refs.ctx.lineTo(x,CONFIG.GEOMETRY.ROWS); Refs.ctx.stroke(); 
+        }
+        for(let y=0; y<=CONFIG.GEOMETRY.ROWS; y++) { 
+            Refs.ctx.beginPath(); Refs.ctx.moveTo(0,y); Refs.ctx.lineTo(CONFIG.GEOMETRY.COLS,y); Refs.ctx.stroke(); 
+        }
+
+        // 4. Render Static Arena Rings
+        this.renderMatrixToSurface(Refs.ctx, this.arena, {x:0, y:0});
+        
+        if (this.player.matrix) {
+            // 5. Calculate & Render Ghost Piece (Aiming Shadow)
+            const shadowCoords = { x: this.player.pos.x, y: this.player.pos.y };
+            while (!this.detectCollision(this.arena, { pos: shadowCoords, matrix: this.player.matrix })) {
+                shadowCoords.y++;
+            }
+            shadowCoords.y--;
+            this.renderMatrixToSurface(Refs.ctx, this.player.matrix, shadowCoords, true);
+            
+            // 6. Render Active Falling Piece
+            this.renderMatrixToSurface(Refs.ctx, this.player.matrix, this.player.pos);
+        }
+
+        // 7. Update and Draw Visual Effects (Trails & Particles)
+        EffectsEngine.update();
+        EffectsEngine.render(Refs.ctx);
+        
+        Refs.ctx.restore();
+
+        // 8. Sidebar HUD Rendering
+        Refs.nextCtx.clearRect(0,0,5,5); 
+        this.renderMatrixToSurface(Refs.nextCtx, this.nextPiece, {x:0, y:0});
+        
+        Refs.holdCtx.clearRect(0,0,5,5); 
+        if (this.heldPiece) {
+            this.renderMatrixToSurface(Refs.holdCtx, this.heldPiece, {x:0, y:0});
+        }
+    },
+
+    renderBlockElement(targetCtx, px, py, colorIndex, ghostMode) {
+        targetCtx.globalAlpha = ghostMode ? 0.35 : 1.0;
+        const cx = px + 0.5;
+        const cy = py + 0.5;
+        
+        // HELLO KITTY BRAND LOGIC
+        // Restricted to Type 1 (Pink) and Type 2 (Yellow) rings. Never shown on ghost aiming shadow.
+        if (!ghostMode && (colorIndex === 1 || colorIndex === 2)) {
+            targetCtx.fillStyle = CONFIG.COLORS[colorIndex];
+            // Left Ear
+            targetCtx.beginPath(); targetCtx.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); targetCtx.fill();
+            // Right Ear
+            targetCtx.beginPath(); targetCtx.arc(cx + 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); targetCtx.fill();
+        }
+        
+        // PHYSICAL RING BODY
+        targetCtx.beginPath();
+        targetCtx.arc(cx, cy, 0.42, 0, Math.PI * 2);
+        targetCtx.fillStyle = CONFIG.COLORS[colorIndex];
+        targetCtx.fill();
+        targetCtx.strokeStyle = '#FFFFFF';
+        targetCtx.lineWidth = 0.08;
+        targetCtx.stroke();
+        
+        targetCtx.globalAlpha = 1.0;
+    },
+
+    renderMatrixToSurface(targetCtx, matrix, offset, isGhost = false) {
+        if (!matrix) return;
+        matrix.forEach((row, y) => row.forEach((val, x) => {
+            if (val !== 0) {
+                this.renderBlockElement(targetCtx, x + offset.x, y + offset.y, val, isGhost);
+            }
+        }));
+    }
+};
+
+// --- VI. TACTILE INPUT & GESTURE ENGINE (IOS OPTIMIZED) ---
+let anchorX = 0, anchorY = 0, swipeDetected = false;
+
+Refs.canvas.addEventListener('touchstart', event => {
+    if (Game.paused) return;
+    anchorX = event.touches[0].clientX; 
+    anchorY = event.touches[0].clientY;
+    swipeDetected = false;
+}, {passive: false});
+
+Refs.canvas.addEventListener('touchmove', event => {
+    if (Game.paused) return; 
+    event.preventDefault(); // Lock iPad viewport bounce
+    
+    const currX = event.touches[0].clientX;
+    const currY = event.touches[0].clientY;
+    const deltaX = currX - anchorX;
+    const deltaY = currY - anchorY;
+    
+    // Buffer threshold (12px) to prevent accidental micro-movement
+    if (Math.abs(deltaX) > 12 || Math.abs(deltaY) > 12) swipeDetected = true;
+
+    // A. Tactile Drag: Horizontal Movement Step
+    if (Math.abs(deltaX) > 35) {
+        const stepDir = deltaX > 0 ? 1 : -1;
+        Game.player.pos.x += stepDir;
+        
+        if (Game.detectCollision()) {
+            Game.player.pos.x -= stepDir;
+        } else {
+            AudioEngine.playSfx(400, 'sine', 0.045);
+        }
+        anchorX = currX; // Reset anchor for smooth continuous sliding
     }
     
-    // Sticky Soft Drop: Vertical Slide
-    if (dy > 60) {
-        dropInterval = 50; 
+    // B. Sticky Soft Drop: Drag Down
+    if (deltaY > 60) {
+        Game.dropInterval = 45; // High speed descent
     }
 }, {passive: false});
 
-canvas.addEventListener('touchend', () => {
-    if (!isPaused && !didMove) {
-        playerRotate(1); // Intentional tap registered as rotation
+Refs.canvas.addEventListener('touchend', () => {
+    // Treat clean tap as rotation
+    if (!Game.paused && !swipeDetected) {
+        Game.executeRotateLogic();
     }
-    if (!isPaused) {
-        dropInterval = themes[currentLevelIndex].speed;
+    // Restore world drop speed on lift-off
+    if (!Game.paused) {
+        Game.dropInterval = CONFIG.LEVELS[Game.currentLevel].speed;
     }
 });
 
-// --- VI. ROTATION & PHYSICS ---
-function playerRotate(dir) {
-    const pos = player.pos.x;
-    let offset = 1;
-    rotate(player.matrix, dir);
+/**
+ * Advanced Rotation Logic with Edge Kicking
+ */
+Game.executeRotateLogic = function() {
+    const originalMatrix = this.player.matrix;
+    const originalPosX = this.player.pos.x;
     
-    // Basic Wall Kick Mechanism
-    while (collide(arena, player)) {
-        player.pos.x += offset;
-        offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > 4) {
-            rotate(player.matrix, -dir);
-            player.pos.x = pos;
+    // Transpose and reverse for 90deg CW rotation
+    const rotated = this.player.matrix[0].map((_, index) => 
+        this.player.matrix.map(col => col[index]).reverse()
+    );
+    this.player.matrix = rotated;
+    
+    // Edge-Kicking logic: shift left or right if rotation hits a wall
+    let kickOffset = 1;
+    while (this.detectCollision()) {
+        this.player.pos.x += kickOffset;
+        kickOffset = -(kickOffset + (kickOffset > 0 ? 1 : -1));
+        if (kickOffset > 4) {
+            // Revert rotation if no space found
+            this.player.matrix = originalMatrix;
+            this.player.pos.x = originalPosX;
             return;
         }
     }
-    playTone(600, 'sine', 0.05);
-}
+    AudioEngine.playSfx(600, 'sine', 0.05);
+};
 
-function rotate(matrix, dir) {
-    for (let y = 0; y < matrix.length; ++y) {
-        for (let x = 0; x < y; ++x) {
-            [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
-        }
-    }
-    if (dir > 0) matrix.forEach(row => row.reverse());
-    else matrix.reverse();
-}
-
-function playerHold() {
-    if (!canHold) return;
-    if (!heldPiece) {
-        heldPiece = player.matrix;
-        playerReset();
+function handlePieceHoldRequest() {
+    if (!Game.canHoldPiece || Game.paused) return;
+    
+    if (!Game.heldPiece) {
+        Game.heldPiece = Game.player.matrix;
+        Game.spawnNewRing();
     } else {
-        const temp = player.matrix;
-        player.matrix = heldPiece;
-        heldPiece = temp;
-        player.pos.y = 0;
-        player.pos.x = (GRID_W / 2 | 0) - (player.matrix[0].length / 2 | 0);
+        const tempReference = Game.player.matrix;
+        Game.player.matrix = Game.heldPiece;
+        Game.heldPiece = tempReference;
+        Game.player.pos.y = 0;
+        Game.player.pos.x = (CONFIG.GEOMETRY.COLS / 2 | 0) - (Game.player.matrix[0].length / 2 | 0);
     }
-    canHold = false;
-    playTone(300, 'sine', 0.1);
+    Game.canHoldPiece = false;
+    AudioEngine.playSfx(300, 'sine', 0.12);
 }
 
-// --- VII. RENDERING CORE ---
-function drawRing(c, x, y, value, isGhost = false) {
-    c.globalAlpha = isGhost ? 0.3 : 1;
-    const cx = x + 0.5;
-    const cy = y + 0.5;
-    
-    // HELLO KITTY VISUAL LOGIC
-    // Apply ears only to Pink (1) and Yellow (2) pieces, never to ghost shadows.
-    if (!isGhost && (value === 1 || value === 2)) {
-        c.fillStyle = colors[value];
-        // Left Ear
-        c.beginPath(); c.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
-        // Right Ear
-        c.beginPath(); c.arc(cx + 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); c.fill();
-    }
-    
-    // Base Ring
-    c.beginPath();
-    c.arc(cx, cy, 0.42, 0, Math.PI * 2);
-    c.fillStyle = colors[value];
-    c.fill();
-    c.strokeStyle = '#FFFFFF';
-    c.lineWidth = 0.08;
-    c.stroke();
-    
-    c.globalAlpha = 1;
+function handlePieceRotateRequest() { Game.executeRotateLogic(); }
+
+// --- VII. APP STATE HANDLERS ---
+function requestAdventureSession() {
+    AudioEngine.unlock();
+    document.getElementById('state-gateway').style.display = 'none';
+    Game.reset();
 }
 
-function drawMatrix(c, matrix, offset, isGhost = false) {
-    if (!matrix) return;
-    matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                drawRing(c, x + offset.x, y + offset.y, value, isGhost);
-            }
-        });
-    });
+function executeOverlayTransition() {
+    AudioEngine.unlock();
+    if (Refs.ovBtn.innerText === "CONTINUE") {
+        Refs.overlay.style.display = 'none';
+        Game.paused = false;
+        AudioEngine.playTheme();
+        requestAnimationFrame(Game.mainLoop.bind(Game));
+    } else {
+        Game.reset();
+    }
 }
 
-/**
- * Main Render Loop
- */
-function draw() {
-    // Background Theming
-    ctx.fillStyle = themes[currentLevelIndex].bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Roblox "Baseplate" Grid Rendering
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-    ctx.lineWidth = 0.03;
-    for (let x = 0; x <= GRID_W; x++) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GRID_H); ctx.stroke();
-    }
-    for (let y = 0; y <= GRID_H; y++) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(GRID_W, y); ctx.stroke();
-    }
-
-    if (player.matrix) {
-        drawMatrix(ctx, arena, {x: 0, y: 0});
-        
-        // Ghost Piece Calculation
-        const ghost = { x: player.pos.x, y: player.pos.y };
-        while (!collide(arena, { pos: ghost, matrix: player.matrix })) {
-            ghost.y++;
-        }
-        ghost.y--;
-        
-        drawMatrix(ctx, player.matrix, ghost, true);
-        drawMatrix(ctx, player.matrix, player.pos);
-    }
-    
-    // Secondary HUD Canvases
-    nctx.clearRect(0, 0, 5, 5);
-    drawMatrix(nctx, nextPiece, {x: 0, y: 0});
-    
-    hctx.clearRect(0, 0, 5, 5);
-    if (heldPiece) drawMatrix(hctx, heldPiece, {x: 0, y: 0});
-}
-
-/**
- * Physics and Logic Loop
- */
-function update(time = 0) {
-    if (isPaused) return;
-    
-    const deltaTime = time - lastTime;
-    lastTime = time;
-    
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-        player.pos.y++;
-        if (collide(arena, player)) {
-            player.pos.y--;
-            merge(arena, player);
-            arenaSweep();
-            playerReset();
-            playTone(200, 'sine', 0.1);
-        }
-        dropCounter = 0;
-    }
-    
-    draw();
-    requestAnimationFrame(update);
-}
-
-// --- VIII. KEYBOARD SUPPORT (DESKTOP) ---
+// Global Keyboard Support for Testing
 document.addEventListener('keydown', e => {
-    if (isPaused) return;
-    switch (e.keyCode) {
-        case 37: // Left
-            player.pos.x--;
-            if (collide(arena, player)) player.pos.x++;
-            else playTone(400, 'sine', 0.05);
-            break;
-        case 39: // Right
-            player.pos.x++;
-            if (collide(arena, player)) player.pos.x--;
-            else playTone(400, 'sine', 0.05);
-            break;
-        case 40: // Down
-            dropInterval = 50;
-            break;
-        case 38: // Up
-        case 32: // Space
-            playerRotate(1);
-            break;
-        case 72: // H
-            playerHold();
-            break;
-    }
+    if (Game.paused) return;
+    if (e.keyCode === 37) { Game.player.pos.x--; if(Game.detectCollision()) Game.player.pos.x++; else AudioEngine.playSfx(400,'sine',0.05); }
+    if (e.keyCode === 39) { Game.player.pos.x++; if(Game.detectCollision()) Game.player.pos.x--; else AudioEngine.playSfx(400,'sine',0.05); }
+    if (e.keyCode === 40) Game.dropInterval = 45;
+    if (e.keyCode === 38 || e.keyCode === 32) Game.executeRotateLogic();
+    if (e.keyCode === 72) handlePieceHoldRequest();
 });
+document.addEventListener('keyup', e => { if (e.keyCode === 40) Game.dropInterval = CONFIG.LEVELS[Game.currentLevel].speed; });
 
-document.addEventListener('keyup', e => {
-    if (e.keyCode === 40) {
-        dropInterval = themes[currentLevelIndex].speed;
-    }
-});
-
-// INITIAL FRAME RENDER
-draw();
-
+// Initial Pre-render
+Game.performRenderCall();
+console.log("PRODUCTION ENGINE: DANTE'S RINGS V3.0.0 LOADED.");
 </script>
 </body>
 </html>

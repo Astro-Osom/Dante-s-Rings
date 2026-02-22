@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dante's Rings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { background: #FFDEF2; font-family: 'Comic Sans MS', sans-serif; overflow: hidden; touch-action: none; text-align: center; }
+        #game-container { position: relative; display: inline-block; margin-top: 20px; border: 8px solid #FFF; border-radius: 20px; background: #87CEEB; }
+        canvas { display: block; border-radius: 12px; }
+        #ui { color: #FF69B4; font-size: 24px; font-weight: bold; text-shadow: 2px 2px #FFF; }
+        #dante { position: absolute; left: -120px; bottom: 0; width: 100px; transition: 0.3s; font-size: 50px; }
+        .controls { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
+        button { width: 80px; height: 80px; border-radius: 50%; border: none; background: #FFF; color: #FF69B4; font-size: 30px; box-shadow: 0 5px #FFB6C1; cursor: pointer; }
+        button:active { transform: translateY(4px); box-shadow: 0 1px #FFB6C1; }
+    </style>
+</head>
+<body>
+
+    <div id="ui">High Score: <span id="score">0</span></div>
+    
+    <div id="game-container">
+        <div id="dante">👦</div>
+        <canvas id="tetris" width="240" height="400"></canvas>
+    </div>
+
+    <div class="controls">
+        <button onclick="playerMove(-1)">⬅️</button>
+        <button onclick="playerRotate(1)">🔄</button>
+        <button onclick="playerMove(1)">➡️</button>
+        <button onclick="playerDrop()">⬇️</button>
+    </div>
+
+<script>
+const canvas = document.getElementById('tetris');
+const context = canvas.getContext('2d');
+const scoreElement = document.getElementById('score');
+const dante = document.getElementById('dante');
+
+context.scale(20, 20);
+
+// Candy Colors for the Rings
+const colors = [
+    null,
+    '#FF69B4', // Pink (Bow)
+    '#FFD700', // Yellow (Bear)
+    '#9370DB', // Purple (Whiskers)
+    '#00BFFF', // Blue (Star)
+    '#FF4500', // Orange (Sparkle)
+    '#32CD32', // Green (Bunny)
+    '#FF0000', // Red (Heart)
+];
+
+function createPiece(type) {
+    if (type === 'I') return [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]];
+    if (type === 'L') return [[0, 2, 0], [0, 2, 0], [0, 2, 2]];
+    if (type === 'J') return [[0, 3, 0], [0, 3, 0], [3, 3, 0]];
+    if (type === 'O') return [[4, 4], [4, 4]];
+    if (type === 'Z') return [[5, 5, 0], [0, 5, 5], [0, 0, 0]];
+    if (type === 'S') return [[0, 6, 6], [6, 6, 0], [0, 0, 0]];
+    if (type === 'T') return [[0, 7, 0], [7, 7, 7], [0, 0, 0]];
+}
+
+function draw() {
+    context.fillStyle = '#87CEEB';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    drawMatrix(arena, {x: 0, y: 0});
+    drawMatrix(player.matrix, player.pos);
+}
+
+function drawMatrix(matrix, offset) {
+    matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                // Draw Ring (Circle) instead of Block
+                context.beginPath();
+                context.arc(x + offset.x + 0.5, y + offset.y + 0.5, 0.45, 0, Math.PI * 2);
+                context.fillStyle = colors[value];
+                context.fill();
+                context.strokeStyle = 'white';
+                context.lineWidth = 0.05;
+                context.stroke();
+                // Add a "shimmer" dot for candy look
+                context.fillStyle = 'rgba(255,255,255,0.5)';
+                context.beginPath();
+                context.arc(x + offset.x + 0.35, y + offset.y + 0.35, 0.1, 0, Math.PI * 2);
+                context.fill();
+            }
+        });
+    });
+}
+
+// Logic for clearing lines and Dante's reaction
+function arenaSweep() {
+    let rowCount = 1;
+    outer: for (let y = arena.length - 1; y > 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+            if (arena[y][x] === 0) continue outer;
+        }
+        const row = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+        player.score += rowCount * 10;
+        rowCount *= 2;
+        
+        // DANTE REACTS!
+        dante.innerText = '🤩';
+        setTimeout(() => dante.innerText = '👦', 1000);
+    }
+    scoreElement.innerText = player.score;
+}
+
+// Standard Tetris Logic (Simplified)
+function collide(arena, player) {
+    const [m, o] = [player.matrix, player.pos];
+    for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < m[y].length; ++x) {
+            if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) return true;
+        }
+    }
+    return false;
+}
+
+function merge(arena, player) {
+    player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) arena[y + player.pos.y][x + player.pos.x] = value;
+        });
+    });
+}
+
+function playerDrop() {
+    player.pos.y++;
+    if (collide(arena, player)) {
+        player.pos.y--;
+        merge(arena, player);
+        playerReset();
+        arenaSweep();
+    }
+    dropCounter = 0;
+}
+
+function playerMove(dir) {
+    player.pos.x += dir;
+    if (collide(arena, player)) player.pos.x -= dir;
+}
+
+function playerReset() {
+    const pieces = 'ILJOTSZ';
+    player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    if (collide(arena, player)) {
+        arena.forEach(row => row.fill(0));
+        player.score = 0;
+        scoreElement.innerText = 0;
+    }
+}
+
+function playerRotate(dir) {
+    const pos = player.pos.x;
+    let offset = 1;
+    rotate(player.matrix, dir);
+    while (collide(arena, player)) {
+        player.pos.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > player.matrix[0].length) {
+            rotate(player.matrix, -dir);
+            player.pos.x = pos;
+            return;
+        }
+    }
+}
+
+function rotate(matrix, dir) {
+    for (let y = 0; y < matrix.length; ++y) {
+        for (let x = 0; x < y; ++x) {
+            [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+        }
+    }
+    if (dir > 0) matrix.forEach(row => row.reverse());
+    else matrix.reverse();
+}
+
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+
+function update(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) playerDrop();
+    draw();
+    requestAnimationFrame(update);
+}
+
+const arena = Array.from({length: 20}, () => Array(12).fill(0));
+
+const player = {
+    pos: {x: 0, y: 0},
+    matrix: null,
+    score: 0,
+};
+
+playerReset();
+update();
+</script>
+</body>
+</html>

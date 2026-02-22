@@ -1,54 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dante's Rings</title>
+    <title>Dante's Rings: Pro Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        body { background: #FFDEF2; font-family: 'Comic Sans MS', sans-serif; overflow: hidden; touch-action: none; text-align: center; }
-        #game-container { position: relative; display: inline-block; margin-top: 20px; border: 8px solid #FFF; border-radius: 20px; background: #87CEEB; }
-        canvas { display: block; border-radius: 12px; }
-        #ui { color: #FF69B4; font-size: 24px; font-weight: bold; text-shadow: 2px 2px #FFF; }
-        #dante { position: absolute; left: -120px; bottom: 0; width: 100px; transition: 0.3s; font-size: 50px; }
-        .controls { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
-        button { width: 80px; height: 80px; border-radius: 50%; border: none; background: #FFF; color: #FF69B4; font-size: 30px; box-shadow: 0 5px #FFB6C1; cursor: pointer; }
-        button:active { transform: translateY(4px); box-shadow: 0 1px #FFB6C1; }
+        :root { --accent: #FF1493; }
+        body { 
+            transition: background 1s ease;
+            font-family: 'Comic Sans MS', sans-serif; 
+            overflow: hidden; touch-action: none; margin: 0;
+            display: flex; flex-direction: column; align-items: center;
+            background: #004b7c; color: white;
+        }
+        #main-layout { display: flex; align-items: flex-start; gap: 15px; margin-top: 10px; position: relative; }
+        
+        /* Sidebars for Hold and Next */
+        .sidebar { display: flex; flex-direction: column; gap: 10px; width: 80px; }
+        .box { 
+            background: rgba(255, 255, 255, 0.2); 
+            border: 4px solid #FFF; border-radius: 15px; 
+            height: 80px; display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .box-label { font-size: 14px; text-transform: uppercase; font-weight: bold; text-align: center; }
+
+        #game-container { position: relative; border: 8px solid #FFF; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        canvas { display: block; border-radius: 20px; background: #87CEEB; }
+        
+        #dante-sidebar { position: absolute; left: -90px; bottom: 10px; font-size: 70px; transition: 0.2s; }
+
+        /* Progress Bar */
+        #progress-container { width: 240px; height: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; margin: 10px 0; border: 2px solid #FFF; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: #39FF14; transition: width 0.3s; }
+
+        /* Controls */
+        .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 10px; width: 95%; max-width: 500px; }
+        button { 
+            height: 70px; border-radius: 15px; border: none; background: #FFF; font-size: 28px; 
+            box-shadow: 0 5px #CCC; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        button:active { transform: translateY(3px); box-shadow: 0 2px #CCC; }
+        .btn-pause { position: absolute; top: 10px; right: 10px; width: 50px; height: 50px; z-index: 100; font-size: 20px; }
+
+        /* Overlays */
+        #overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); display: none; flex-direction: column; 
+            align-items: center; justify-content: center; border-radius: 20px; z-index: 50;
+        }
+        #overlay h2 { font-size: 30px; margin-bottom: 20px; }
+
+        .key-hints { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="ui">High Score: <span id="score">0</span></div>
+    <button class="btn-pause" onclick="togglePause()">⏸️</button>
+
+    <div id="ui-header">
+        <div id="level-title">Underwater World</div>
+        <div style="font-size: 14px;">Score: <span id="score">0</span> | Next Level in: <span id="lines-left">10</span></div>
+    </div>
+
+    <div id="progress-container"><div id="progress-fill"></div></div>
     
-    <div id="game-container">
-        <div id="dante">👦</div>
-        <canvas id="tetris" width="240" height="400"></canvas>
+    <div id="main-layout">
+        <div class="sidebar">
+            <div class="box-label">Hold</div>
+            <div class="box"><canvas id="hold-canvas" width="60" height="60"></canvas></div>
+        </div>
+
+        <div id="game-container">
+            <div id="dante-sidebar">👦</div>
+            <canvas id="tetris" width="240" height="400"></canvas>
+            <div id="overlay">
+                <h2 id="overlay-text">PAUSED</h2>
+                <button onclick="togglePause()" style="width: 150px; height: 50px; font-size: 20px;">RESUME</button>
+                <button onclick="location.reload()" style="margin-top:10px; width: 150px; height: 50px; font-size: 20px; background:#FFB6C1;">RESTART</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="box-label">Next</div>
+            <div class="box"><canvas id="next-canvas" width="60" height="60"></canvas></div>
+        </div>
     </div>
 
     <div class="controls">
-        <button onclick="playerMove(-1)">⬅️</button>
-        <button onclick="playerRotate(1)">🔄</button>
-        <button onclick="playerMove(1)">➡️</button>
-        <button onclick="playerDrop()">⬇️</button>
+        <button onpointerdown="playerMove(-1)">⬅️</button>
+        <button onpointerdown="playerRotate(1)">🔄</button>
+        <button onpointerdown="playerMove(1)">➡️</button>
+        <button onpointerdown="playerHold()">📦</button>
+        <button onpointerdown="startDrop()" onpointerup="stopDrop()" onpointerleave="stopDrop()">⬇️</button>
     </div>
+
+    <div class="key-hints">⌨️ Arrows to move • Space to Rotate • H to Hold • P to Pause</div>
 
 <script>
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
-const scoreElement = document.getElementById('score');
-const dante = document.getElementById('dante');
+const holdCanvas = document.getElementById('hold-canvas');
+const hctx = holdCanvas.getContext('2d');
+const nextCanvas = document.getElementById('next-canvas');
+const nctx = nextCanvas.getContext('2d');
 
 context.scale(20, 20);
+hctx.scale(15, 15);
+nctx.scale(15, 15);
 
-// Candy Colors for the Rings
-const colors = [
-    null,
-    '#FF69B4', // Pink (Bow)
-    '#FFD700', // Yellow (Bear)
-    '#9370DB', // Purple (Whiskers)
-    '#00BFFF', // Blue (Star)
-    '#FF4500', // Orange (Sparkle)
-    '#32CD32', // Green (Bunny)
-    '#FF0000', // Red (Heart)
+const themes = [
+    { name: "Underwater World", bg: "#0077be", body: "#004b7c" },
+    { name: "Pandora", bg: "#1a0033", body: "#4b0082" },
+    { name: "Minecraft", bg: "#7cfc00", body: "#556b2f" },
+    { name: "Legoworld", bg: "#ff0000", body: "#b22222" },
+    { name: "Rainforest", bg: "#006400", body: "#004d00" },
+    { name: "Outer Space", bg: "#000022", body: "#000011" },
+    { name: "Jungle", bg: "#228b22", body: "#1a471a" },
+    { name: "School", bg: "#2f4f4f", body: "#1c2e2e" },
+    { name: "Sun Surface", bg: "#ff8c00", body: "#ff4500" },
+    { name: "Dream World", bg: "#e6e6fa", body: "#d8bfd8" }
 ];
+
+const colors = [null, '#FF1493', '#FFEA00', '#A020F0', '#00E5FF', '#FF4500', '#39FF14', '#FF0000'];
 
 function createPiece(type) {
     if (type === 'I') return [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]];
@@ -60,56 +133,84 @@ function createPiece(type) {
     if (type === 'T') return [[0, 7, 0], [7, 7, 7], [0, 0, 0]];
 }
 
-function draw() {
-    context.fillStyle = '#87CEEB';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    drawMatrix(arena, {x: 0, y: 0});
-    drawMatrix(player.matrix, player.pos);
+function drawRing(ctx, x, y, value, scale = 1) {
+    const cx = x + 0.5;
+    const cy = y + 0.5;
+    if (value === 1 || value === 2) {
+        ctx.fillStyle = colors[value];
+        ctx.beginPath(); ctx.arc(cx - 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 0.25, cy - 0.35, 0.15, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, 0.42, 0, Math.PI * 2);
+    ctx.fillStyle = colors[value];
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.05;
+    ctx.stroke();
+    if (value === 1) {
+        ctx.fillStyle = '#FF0000';
+        ctx.beginPath(); ctx.arc(cx + 0.2, cy - 0.2, 0.12, 0, Math.PI * 2); ctx.fill();
+    }
 }
 
-function drawMatrix(matrix, offset) {
+function draw() {
+    context.fillStyle = themes[currentLevelIndex].bg;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    drawMatrix(context, arena, {x: 0, y: 0});
+    drawMatrix(context, player.matrix, player.pos);
+    
+    // Draw Next
+    nctx.clearRect(0,0,4,4);
+    drawMatrix(nctx, nextPiece, {x:0, y:0});
+    
+    // Draw Hold
+    hctx.clearRect(0,0,4,4);
+    if (heldPiece) drawMatrix(hctx, heldPiece, {x:0, y:0});
+}
+
+function drawMatrix(ctx, matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
-            if (value !== 0) {
-                // Draw Ring (Circle) instead of Block
-                context.beginPath();
-                context.arc(x + offset.x + 0.5, y + offset.y + 0.5, 0.45, 0, Math.PI * 2);
-                context.fillStyle = colors[value];
-                context.fill();
-                context.strokeStyle = 'white';
-                context.lineWidth = 0.05;
-                context.stroke();
-                // Add a "shimmer" dot for candy look
-                context.fillStyle = 'rgba(255,255,255,0.5)';
-                context.beginPath();
-                context.arc(x + offset.x + 0.35, y + offset.y + 0.35, 0.1, 0, Math.PI * 2);
-                context.fill();
-            }
+            if (value !== 0) drawRing(ctx, x + offset.x, y + offset.y, value);
         });
     });
 }
 
-// Logic for clearing lines and Dante's reaction
 function arenaSweep() {
-    let rowCount = 1;
+    let rowCount = 0;
     outer: for (let y = arena.length - 1; y > 0; --y) {
         for (let x = 0; x < arena[y].length; ++x) {
             if (arena[y][x] === 0) continue outer;
         }
-        const row = arena.splice(y, 1)[0].fill(0);
-        arena.unshift(row);
+        arena.splice(y, 1);
+        arena.unshift(new Array(12).fill(0));
         ++y;
-        player.score += rowCount * 10;
-        rowCount *= 2;
-        
-        // DANTE REACTS!
-        dante.innerText = '🤩';
-        setTimeout(() => dante.innerText = '👦', 1000);
+        rowCount++;
     }
-    scoreElement.innerText = player.score;
+    if (rowCount > 0) {
+        totalLines += rowCount;
+        player.score += rowCount * 10;
+        updateUI();
+        dante.innerText = '🤩';
+        setTimeout(() => dante.innerText = '👦', 800);
+    }
 }
 
-// Standard Tetris Logic (Simplified)
+function updateUI() {
+    document.getElementById('score').innerText = player.score;
+    let linesInLevel = totalLines % 10;
+    document.getElementById('lines-left').innerText = 10 - linesInLevel;
+    document.getElementById('progress-fill').style.width = (linesInLevel * 10) + '%';
+    
+    let newLevel = Math.floor(totalLines / 10);
+    if (newLevel > currentLevelIndex && newLevel < themes.length) {
+        currentLevelIndex = newLevel;
+        document.body.style.background = themes[currentLevelIndex].body;
+        document.getElementById('level-title').innerText = themes[currentLevelIndex].name;
+    }
+}
+
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
@@ -128,6 +229,34 @@ function merge(arena, player) {
     });
 }
 
+function playerReset() {
+    const pieces = 'ILJOTSZ';
+    player.matrix = nextPiece || createPiece(pieces[pieces.length * Math.random() | 0]);
+    nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    canHold = true;
+    if (collide(arena, player)) {
+        document.getElementById('overlay-text').innerText = "GAME OVER";
+        togglePause();
+    }
+}
+
+function playerHold() {
+    if (!canHold) return;
+    if (!heldPiece) {
+        heldPiece = player.matrix;
+        playerReset();
+    } else {
+        const temp = player.matrix;
+        player.matrix = heldPiece;
+        heldPiece = temp;
+        player.pos.y = 0;
+        player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    }
+    canHold = false;
+}
+
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
@@ -142,18 +271,6 @@ function playerDrop() {
 function playerMove(dir) {
     player.pos.x += dir;
     if (collide(arena, player)) player.pos.x -= dir;
-}
-
-function playerReset() {
-    const pieces = 'ILJOTSZ';
-    player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
-    player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-    if (collide(arena, player)) {
-        arena.forEach(row => row.fill(0));
-        player.score = 0;
-        scoreElement.innerText = 0;
-    }
 }
 
 function playerRotate(dir) {
@@ -184,8 +301,19 @@ function rotate(matrix, dir) {
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
+let isPaused = false;
+
+function togglePause() {
+    isPaused = !isPaused;
+    document.getElementById('overlay').style.display = isPaused ? 'flex' : 'none';
+    if (!isPaused) update();
+}
+
+function startDrop() { dropInterval = 50; }
+function stopDrop() { dropInterval = 1000; }
 
 function update(time = 0) {
+    if (isPaused) return;
     const deltaTime = time - lastTime;
     lastTime = time;
     dropCounter += deltaTime;
@@ -194,13 +322,24 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
-const arena = Array.from({length: 20}, () => Array(12).fill(0));
+// Keyboard Listeners
+document.addEventListener('keydown', event => {
+    if (event.keyCode === 37) playerMove(-1);
+    else if (event.keyCode === 39) playerMove(1);
+    else if (event.keyCode === 40) startDrop();
+    else if (event.keyCode === 38 || event.keyCode === 32) playerRotate(1);
+    else if (event.keyCode === 72) playerHold();
+    else if (event.keyCode === 80) togglePause();
+});
+document.addEventListener('keyup', event => { if (event.keyCode === 40) stopDrop(); });
 
-const player = {
-    pos: {x: 0, y: 0},
-    matrix: null,
-    score: 0,
-};
+const arena = Array.from({length: 20}, () => Array(12).fill(0));
+const player = { pos: {x: 0, y: 0}, matrix: null, score: 0 };
+let nextPiece = null;
+let heldPiece = null;
+let canHold = true;
+let totalLines = 0;
+let currentLevelIndex = 0;
 
 playerReset();
 update();
